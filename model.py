@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import math
+import numpy as np
 
 class model(ABC):
     @abstractmethod
@@ -30,7 +31,9 @@ class linear(model):
                 s2=s2+y[i]
                 s3=s3+x[i]**2
             A=(n*s-(s2*s1))/(n*s3-s1**2)
-            B=(s2-A*s1)/n
+            A=np.array(A)
+            A=np.round(A,4)
+            B=(s2 - A*s1)/n
             self.A=A
             self.B=B
             print("the slop is: ",A," the intercept: ",B)   
