@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 import time
 
 
-X = np.random.randn(30000, 20)
+X = np.random.randn(30000,1)
 y = np.random.randn(30000)
 model1=LinearRegression()
 model2=linear()
