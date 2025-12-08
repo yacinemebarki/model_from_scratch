@@ -16,31 +16,34 @@ def compute_tf(data):
         for j in word:
             df[j]=df.get(j,0)+1
             
-        
+    vocab=list(df.keys()) 
+    word_to_index={word: i for i, word in enumerate(vocab)}   
     tfidf_result = []   
     for sent in data:
         words=decompose(sent)
-        tfidf_count={}
         tf_count={}
+        i=0
+        tfidf_count=np.zeros(len(vocab))
         for word in words:
             tf_count[word]=tf_count.get(word,0)+1
         for word in tf_count:
-            tfidf_count[word]= tf_count[word]*np.log10(n/(df[word]))
+            i=word_to_index[word]
+            tfidf_count[i]=tf_count[word]*np.log10(n/(df[word]))
+            
+        tfidf_count=np.array(tfidf_count)
         tfidf_result.append(tfidf_count)
-    return tfidf_result
-data=["This is a sample sentence.","This sentence is another example.","TF-IDF is a useful technique."]
-tfidf_values=compute_tf(data)
-for i, sent_tfidf in enumerate(tfidf_values):
-    print(f"Sentence {i+1} TF-IDF:", sent_tfidf)            
-                
+    return tfidf_result,vocab
+texts = [
+    "Hello world this is a test",
+    "Hello AI world",
+    "AI is amazing"
+]
 
+# Compute TF-IDF
+vectors, vocab = compute_tf(texts)
 
-        
+print("Vocabulary:", vocab)
+print("\nTF-IDF Vectors:\n", vectors)
 
-                
-
-
-
-        
     
-
+            
