@@ -33,17 +33,7 @@ def compute_tf(data):
         tfidf_count=np.array(tfidf_count)
         tfidf_result.append(tfidf_count)
     return tfidf_result,vocab
-texts = [
-    "Hello world this is a test",
-    "Hello AI world",
-    "AI is amazing"
-]
 
-# Compute TF-IDF
-vectors, vocab = compute_tf(texts)
-
-print("Vocabulary:", vocab)
-print("\nTF-IDF Vectors:\n", vectors)
 
     
             

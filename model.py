@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import math
 import numpy as np
+from TFIDf import compute_tf
 
 class model(ABC):
     @abstractmethod
@@ -66,7 +67,12 @@ class linear(model):
             for i in range(n):
                 s=s+abs(y[i]-y2[i])
             return s/n    
-               
+    def vector(self,x):
+        if(len(x)==0):
+            print("empty array")
+            return
+        else :
+            return compute_tf(x)            
                 
 
 
