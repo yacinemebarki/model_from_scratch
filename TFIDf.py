@@ -39,7 +39,7 @@ def compute_tf(data):
             a.append(val)
             
         tfidf.append(a)
-    return tfidf
+    return np.array(tfidf, dtype=float) 
 print(compute_tf(["this is a sample","this is another example example example"]))
 text=["are you learning machine learning",
       "machine learning is fun",

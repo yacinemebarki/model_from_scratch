@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import math
 import numpy as np
-from TFIDf import compute_tf
 
 class model(ABC):
     @abstractmethod
@@ -27,10 +26,12 @@ class linear(model):
             s3=0
             s=0
             for i in range(n):
+                
                 s=s+x[i]*y[i]
                 s1=s1+x[i]
                 s2=s2+y[i]
                 s3=s3+x[i]**2
+                
             A=(n*s-(s2*s1))/(n*s3-s1**2)
             A=np.array(A)
             A=np.round(A,4)
@@ -66,13 +67,20 @@ class linear(model):
             s=0
             for i in range(n):
                 s=s+abs(y[i]-y2[i])
-            return s/n    
-    def vector(self,x):
-        if(len(x)==0):
-            print("empty array")
-            return
-        else :
-            return compute_tf(x)            
+            return s/n 
+    def tfidf_fit(self,x,y):
+        X_bias=np.c_[np.ones(x.shape[0]), x]
+        w_all=np.linalg.pinv(X_bias.T @ X_bias) @ X_bias.T @ y
+        self.B=w_all[0]
+        self.A=w_all[1:]
+        return self.A,self.B
+ 
+
+
+
+
+
+              
                 
 
 
