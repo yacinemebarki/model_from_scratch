@@ -12,7 +12,7 @@ print(my_models.__file__)
 
 print(hasattr(my_models, "linear"))    
 print(hasattr(my_models, "logistic"))  
-
+// testing linear regression model
 X = np.random.randn(30000,1)
 y = np.random.randn(30000)
 model1=LinearRegression()
@@ -23,7 +23,7 @@ end=time.time()
 print("sklearn time: ",end-start)
 print("model coefficients: ",model1.coef_)
 print("model intercept: ",model1.intercept_)
-
+// testing tfidf model
 start=time.time()
 model2.fit(X,y)
 end=time.time()
@@ -60,6 +60,7 @@ end=time.time()
 print("custom model time with TFIDF: ",end-start)
 print("model coefficients: ",model2.A)
 print("model intercept: ",model2.B)
+// testing logistic regression model
 model3=my_models.logistic(1000)
 start=time.time()
 model3.fit(X_custom,labal)
