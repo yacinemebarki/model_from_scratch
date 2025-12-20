@@ -3,6 +3,9 @@ import math
 import numpy as np
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
+def softmax(z):
+    exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
 
 class model(ABC):
     @abstractmethod
@@ -82,12 +85,13 @@ class linear(model):
         return self.A,self.B
 class logistic(model):
 
-    def __init__(self,n,A=0,B=0):
+    def __init__(self,n,A=0,B=0,use=None):
         self.A=A
         self.n=n
         self.B=B
+        self.use=use
         
-    def fit(self,x,y):
+    def fit(self,x,y,use):
         x=np.array(x, dtype=float)
         y=np.array(y, dtype=float)
         x_bias=np.c_[np.ones(x.shape[0]), x]
@@ -95,17 +99,43 @@ class logistic(model):
     
         for i in range(self.n):
             z=x_bias @ w
-            h=sigmoid(z)
+            if use=="sigmoid":
+                h=sigmoid(z)
+            else :
+                h=softmax(z)    
             gradient=x_bias.T @ (h - y.reshape(-1, 1)) / y.size
             w=w-0.01 * gradient
-        self.A=w[1:]
+        self.A=w
         self.B=w[0]
+        self.use=use
         return self.A,self.B
-    def predict(self, x):
+    def predict_proba(self, x):
         x = np.array(x, dtype=float)
         x_bias = np.c_[np.ones(x.shape[0]), x]
-        z = x_bias @ self.w
-        return sigmoid(z)
+        z = x_bias @ self.A
+        if self.use == "sigmoid":
+            probs = sigmoid(z)
+        else:
+            probs = softmax(z)
+        return probs    
+    def predict(self, x, threshold=0.5):
+        probs = self.predict_proba(x)
+        if self.use=="sigmoid":
+            return (probs >= threshold).astype(int).flatten()
+        else:
+            return np.argmax(probs, axis=1)
+        
+    def accuracy(self,y_true,y_pred):
+        if len(y_true)==0 or len(y_true)!=len(y_pred):
+            print("empty array")
+            return
+        else:
+            correct=0
+            for i in range (len(y_true)):
+                if y_true[i]==y_pred[i]:
+                    correct+=1
+            return correct/len(y_true)
+
 
 
 

@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from TFIDf import compute_tf
+from TFIDf import TFIDF
 print(my_models.__file__)
 
 
@@ -43,7 +43,8 @@ end=time.time()
 print("sklearn TFIDF time: ",end-start)
 print("sklearn TFIDF result:\n",X_sklearn)
 start=time.time()
-X_custom=compute_tf(text)
+tfidf_custom=TFIDF()
+X_custom=tfidf_custom.compute_tf(text)
 end=time.time()
 print("custom TFIDF time: ",end-start)
 print("custom TFIDF result:\n",(X_custom))
@@ -63,7 +64,7 @@ print("model intercept: ",model2.B)
 // testing logistic regression model
 model3=my_models.logistic(1000)
 start=time.time()
-model3.fit(X_custom,labal)
+model3.fit(X_custom,labal,"softmax")
 end=time.time()
 print("custom logistic model time with TFIDF: ",end-start)
 print("model coefficients: ",model3.A)
@@ -75,3 +76,17 @@ end=time.time()
 print("sklearn logistic model time with TFIDF: ",end-start)
 print("model coefficients: ",model4.coef_)
 print("model intercept: ",model4.intercept_)
+y_pred=model3.predict(X_custom)
+print(y_pred)
+y_pred=model4.predict_proba(X_sklearn)
+print(y_pred)
+text_pr=["i love machine learning and coding in python","python is fun"]
+X_sklearn_pr=tfidf_sklearn.transform(text_pr).toarray()
+print("sklearn TFIDF transform result:\n",X_sklearn_pr)
+X_custom_pr=tfidf_custom.transform(text_pr)
+print("custom TFIDF transform result:\n",X_custom_pr)
+y_pred_pr=model3.predict(X_custom_pr)
+print(y_pred_pr)
+y_pred_pr=model4.predict(X_sklearn_pr)
+print(y_pred_pr)
+
