@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 import math
 import numpy as np
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 
 class model(ABC):
     @abstractmethod
@@ -69,11 +71,48 @@ class linear(model):
                 s=s+abs(y[i]-y2[i])
             return s/n 
     def tfidf_fit(self,x,y):
+        x=np.array(x, dtype=float)  
+        y=np.array(y, dtype=float)
+        print(x.shape)
+        
         X_bias=np.c_[np.ones(x.shape[0]), x]
         w_all=np.linalg.pinv(X_bias.T @ X_bias) @ X_bias.T @ y
         self.B=w_all[0]
         self.A=w_all[1:]
         return self.A,self.B
+class logistic(model):
+
+    def __init__(self,n,A=0,B=0):
+        self.A=A
+        self.n=n
+        self.B=B
+        
+    def fit(self,x,y):
+        x=np.array(x, dtype=float)
+        y=np.array(y, dtype=float)
+        x_bias=np.c_[np.ones(x.shape[0]), x]
+        w=np.zeros((x_bias.shape[1], 1))
+    
+        for i in range(self.n):
+            z=x_bias @ w
+            h=sigmoid(z)
+            gradient=x_bias.T @ (h - y.reshape(-1, 1)) / y.size
+            w=w-0.01 * gradient
+        self.A=w[1:]
+        self.B=w[0]
+        return self.A,self.B
+    def predict(self, x):
+        x = np.array(x, dtype=float)
+        x_bias = np.c_[np.ones(x.shape[0]), x]
+        z = x_bias @ self.w
+        return sigmoid(z)
+
+
+
+
+
+
+          
  
 
 

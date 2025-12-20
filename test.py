@@ -1,16 +1,22 @@
-from model import linear
+import my_models
 import numpy as np
 import random as rd
 from sklearn.linear_model import LinearRegression
 import time
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
 from TFIDf import compute_tf
+print(my_models.__file__)
 
+
+
+print(hasattr(my_models, "linear"))    
+print(hasattr(my_models, "logistic"))  
 
 X = np.random.randn(30000,1)
 y = np.random.randn(30000)
 model1=LinearRegression()
-model2=linear()
+model2=my_models.linear()
 start=time.time()
 model1.fit(X,y)
 end=time.time()
@@ -54,3 +60,17 @@ end=time.time()
 print("custom model time with TFIDF: ",end-start)
 print("model coefficients: ",model2.A)
 print("model intercept: ",model2.B)
+model3=my_models.logistic(1000)
+start=time.time()
+model3.fit(X_custom,labal)
+end=time.time()
+print("custom logistic model time with TFIDF: ",end-start)
+print("model coefficients: ",model3.A)
+print("model intercept: ",model3.B)
+model4=LogisticRegression()
+start=time.time()
+model4.fit(X_sklearn,labal)
+end=time.time()
+print("sklearn logistic model time with TFIDF: ",end-start)
+print("model coefficients: ",model4.coef_)
+print("model intercept: ",model4.intercept_)
