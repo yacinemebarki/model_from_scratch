@@ -6,6 +6,28 @@ def sigmoid(z):
 def softmax(z):
     exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
     return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+class scaler:
+    def __init__(self):
+        self.min=None
+        self.max=None
+        
+    def transform(self,x):
+        x=np.array(x, dtype=float)
+        self.min=np.min(x,axis=0)
+        self.max=np.max(x,axis=0)
+        if self.min is None or self.max is None:
+            print("you need to fit the model first")
+            return
+        scaled_x=(x - self.min)/(self.max - self.min)
+        return scaled_x
+    def inverse_transform(self,x):
+        x=np.array(x, dtype=float)
+        if self.min is None or self.max is None:
+            print("you need to fit the model first")
+            return
+        original_x=x * (self.max - self.min) + self.min
+        return original_x
+
 
 class model(ABC):
     @abstractmethod
@@ -20,6 +42,10 @@ class linear(model):
     def __init__(self,A=0,B=0):
         self.A=A
         self.B=B
+        
+    def scaler(self,x):
+        scalerd_x=scaler(x)
+        return scalerd_x    
     def fit(self,x,y):
         n=len(x)
         if n==0 or n!=len(y):
@@ -90,7 +116,9 @@ class logistic(model):
         self.n=n
         self.B=B
         self.use=use
-        
+    def scaler(self,x):
+        scalered_x=scaler(x)
+        return scalered_x    
     def fit(self,x,y,use):
         x=np.array(x, dtype=float)
         y=np.array(y, dtype=float)
@@ -125,16 +153,39 @@ class logistic(model):
         else:
             return np.argmax(probs, axis=1)
         
-    def accuracy(self,y_true,y_pred):
+    
+    def confusion_matrix(self,y_true,y_pred):
         if len(y_true)==0 or len(y_true)!=len(y_pred):
             print("empty array")
             return
-        else:
-            correct=0
-            for i in range (len(y_true)):
-                if y_true[i]==y_pred[i]:
-                    correct+=1
-            return correct/len(y_true)
+        True_positive=0
+        False_positive=0
+        True_negative=0
+        False_negative=0
+        for i in range(len(y_true)):
+            
+            if y_true[i]==1 and y_pred[i]==1:
+                True_positive=True_positive+1
+            elif y_true[i]==0 and y_pred[i]==1:
+                False_positive=False_positive+1
+            elif y_true[i]==0 and y_pred[i]==0:
+                True_negative=True_negative+1
+            elif y_true[i]==1 and y_pred[i]==0:
+                False_negative=False_negative+1
+        return np.array([[True_positive,False_positive],[False_negative,True_negative]])
+    def accuracy(self,y_true,y_pred):
+        a=self.confusion_matrix(y_true,y_pred) 
+        return (a[0,0]+a[1,1])/np.sum(a)
+    def precision(self,y_true,y_pred):
+        a=self.confusion_matrix(y_true,y_pred) 
+        return a[0,0]/(a[0,0]+a[0,1])
+    def recall(self,y_true,y_pred):
+        a=self.confusion_matrix(y_true,y_pred) 
+        return a[0,0]/(a[0,0]+a[1,0])
+    def f1_score(self,y_true,y_pred):
+        p=self.precision(y_true,y_pred)
+        r=self.recall(y_true,y_pred)
+        return 2*(p*r)/(p+r)                            
 
 
 
