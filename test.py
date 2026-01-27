@@ -1,6 +1,5 @@
 import my_models
 import numpy as np
-import random as rd
 from sklearn.linear_model import LinearRegression
 import time
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -89,4 +88,14 @@ y_pred_pr=model3.predict(X_custom_pr)
 print(y_pred_pr)
 y_pred_pr=model4.predict(X_sklearn_pr)
 print(y_pred_pr)
+#test decision tree
+from decision_tree_algorithm import node,entropy,information_gain,fit
+
+X_dt = np.array([[0, 0],
+                 [0, 1],
+                 [1, 0],
+                 [1, 1]])
+y_dt = np.array([0, 0, 1, 1])
+tree_model=fit(X_dt,y_dt)
+print(tree_model)  
 
