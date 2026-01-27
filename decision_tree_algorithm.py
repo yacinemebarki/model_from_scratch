@@ -94,13 +94,13 @@ def fit(x,y):
 def print_tree(root):
     if root is None:
         return
-    if root.lable is not None:
-        print("Leaf Node: ",root.lable)
+    if len(np.unique(root.lable)) == 1:
+        print("Leaf Node: ", root.lable)
     else:
         print("Node")
-        print(root.lable)
         print_tree(root.left)
-        print_tree(root.right)  
+        print_tree(root.right)
+ 
 #test 
 X_dt = np.array([1,0,0,1])
 y_dt = np.array([0, 0, 1, 1])
