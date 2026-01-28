@@ -97,14 +97,15 @@ tree_model.fit(X_dt,y_dt)
 tree_model.print_tree()
 for x in [0,1,1,0,1,0]:
     pred=tree_model.predict(tree_model.root,x)
-    print(f"Prediction for input {x}: {pred}")
+    print(f"Prediction for input {x}: {pred}")    
 model5=DecisionTreeClassifier()
 model5.fit(X_dt.reshape(-1,1),y_dt)
 for x in [0,1,1,0,1,0]:
       pred=model5.predict(np.array([[x]]))
       print(f"Sklearn Prediction for input {x}: {pred[0]}")
+#test decision tree regression      
 tree_reg=my_models.decision_tree_regression()
-X_reg = np.array([1,2,3,4,5,6,7,8])
+X_reg = np.array([1,2,3,4,5,6,7,8]).reshape(-1,1)
 y_reg = np.array([1.5,1.7,3.2,3.8,5.1,5.9,7.3,7.8])
 tree_reg.fit(X_reg,y_reg)
 tree_reg.print_tree()

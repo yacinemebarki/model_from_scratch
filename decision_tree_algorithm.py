@@ -123,48 +123,58 @@ def MSE(y_left,y_right):
     mse_right=sum((y_right - mean_right) ** 2) if len(y_right)>0 else 0
     mse=(mse_left + mse_right)/n
     return mse  
-def fit_regression(x,y,max_depth=float('inf'),min_samples=2):
-    x = np.array(x)
+def fit_regression(X, y, max_depth=float('inf'), min_samples=2):
+    X = np.array(X)
     y = np.array(y)
 
-    sort_idx=np.argsort(x)
-    x_sorted=x[sort_idx]
-    y_sorted=y[sort_idx]
-    best_mse = float('inf')
-    best_threshold = None
-    best_left_y=[]
-    best_right_y=[]
+    n_samples,n_features=X.shape
 
-    for i in range(len(x_sorted)-1):
-        threshold=(x_sorted[i]+x_sorted[i+1])/2
-        left_y=[y_sorted[j] for j in range(len(x_sorted)) if x_sorted[j]<=threshold]
-        right_y=[y_sorted[j] for j in range(len(x_sorted)) if x_sorted[j]>threshold]
-        if len(left_y) == 0 or len(right_y) == 0:
-            continue
-        mse=MSE(left_y,right_y) 
-        if mse<best_mse:
-            best_mse=mse
-            best_threshold=threshold
-            best_left_x = [x_sorted[j] for j in range(len(x_sorted)) if x_sorted[j]<=threshold]
-            best_right_x = [x_sorted[j] for j in range(len(x_sorted)) if x_sorted[j]>threshold]
-            best_left_y=left_y
-            best_right_y=right_y
+    
+    
+
+    best_mse = float('inf')
+    best_feature = None
+    best_threshold = None
+    best_split = None
+
+    for feature in range(n_features):
+        x_feature=X[:, feature]
+        sorted_idx=np.argsort(x_feature)
+        x_sorted=x_feature[sorted_idx]
+        y_sorted=y[sorted_idx]
+        for i in range(n_samples - 1):
+            threshold = (x_sorted[i] + x_sorted[i + 1]) / 2
+            left_mask = x_feature <= threshold
+            right_mask = x_feature > threshold
+            if left_mask.sum() == 0 or right_mask.sum() == 0:
+                continue
+            mse = MSE(y[left_mask], y[right_mask])
+            if mse<best_mse:
+                best_mse=mse
+                best_feature=feature
+                best_threshold=threshold
+                best_split=(left_mask, right_mask)
+
+    if max_depth==0 or n_samples<=min_samples or best_mse==0:
+        leaf = node()
+        leaf.value = np.mean(y)
+        return leaf
+    if best_feature is None:
+        leaf = node()
+        leaf.value = np.mean(y)
+        return leaf
 
     root=node()
+    root.feature=best_feature
     root.threshold=best_threshold
-    if  max_depth==0 or len(y)<=min_samples or best_mse==0 or best_threshold is None:
-        root.value=np.mean(y)
-        return root
-    else:
-        left_node=node()
-        right_node=node()
-        left_node.feature=best_left_x
-        left_node.lable=best_left_y
-        right_node.feature=best_right_x
-        right_node.lable=best_right_y
-        root.left=fit_regression(left_node.feature,left_node.lable,max_depth-1,min_samples)
-        root.right=fit_regression(right_node.feature,right_node.lable,max_depth-1,min_samples)
-        return root
+
+    left_mask, right_mask=best_split
+
+    root.left = fit_regression(X[left_mask], y[left_mask], max_depth - 1, min_samples)
+    root.right = fit_regression(X[right_mask], y[right_mask], max_depth - 1, min_samples)
+
+    return root
+
 
 def print_tree_regression(root):
     if root is None:
