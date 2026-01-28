@@ -207,3 +207,24 @@ class decision_tree(model):
             return self.predict(root.left, x)
         else:
             return self.predict(root.right, x)
+from decision_tree_algorithm import fit_regression,print_tree_regression        
+class decision_tree_regression(model):
+    def __init__(self,root=None,max_depth=float('inf'),min_samples=2):
+        self.root=root
+        self.max_depth=max_depth
+        self.min_samples=min_samples
+    def fit(self,x,y):
+        self.root=fit_regression(x,y,self.max_depth,self.min_samples)
+        return self.root
+    def print_tree(self):
+        
+        print_tree_regression(self.root)
+    def predict(self,root,x):
+        if root is None:
+            return
+        if root.left is None and root.right is None:
+            return root.value
+        if x <= root.threshold:
+            return self.predict(root.left, x)
+        else:
+            return self.predict(root.right, x)        
