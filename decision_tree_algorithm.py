@@ -68,8 +68,18 @@ def fit(x,y):
         
         
         if len(np.unique(root.lable)) == 1:
-            return root
-        ig,y1,y0,t1,t0=information_gain(root.feature,root.lable)
+            leaf = node()
+            leaf.lable = [root.lable[0]]  
+            leaf.left = None
+            leaf.right = None
+            return leaf
+        ig,t0,y0,t1,y1=information_gain(root.feature,root.lable)
+        if ig == 0 or len(y0) == 0 or len(y1) == 0:
+            leaf = node()
+            leaf.lable = [np.bincount(root.lable).argmax()]  
+            leaf.left = None
+            leaf.right = None
+            return leaf
         print("X:", t0)
         print("y:", y0)
         print("X:", t1)
@@ -101,9 +111,3 @@ def print_tree(root):
         print_tree(root.left)
         print_tree(root.right)
  
-#test 
-X_dt = np.array([1,0,0,1])
-y_dt = np.array([0, 0, 1, 1])
-tree_model=fit(X_dt,y_dt)
-print_tree(tree_model)  
-        

@@ -4,6 +4,7 @@ from sklearn.linear_model import LinearRegression
 import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
 from TFIDf import TFIDF
 print(my_models.__file__)
 
@@ -89,13 +90,21 @@ print(y_pred_pr)
 y_pred_pr=model4.predict(X_sklearn_pr)
 print(y_pred_pr)
 #test decision tree
-from decision_tree_algorithm import node,entropy,information_gain,fit
+tree_model=my_models.decision_tree()
+X_dt = np.array([1,0,0,1,1,0,1,0])
+y_dt = np.array([0,0,1,1,1,0,1,0])
+tree_model.fit(X_dt,y_dt)
+tree_model.print_tree()
+for x in [0,1,1,0,1,0]:
+    pred=tree_model.predict(tree_model.root,x)
+    print(f"Prediction for input {x}: {pred}")
+model5=DecisionTreeClassifier()
+model5.fit(X_dt.reshape(-1,1),y_dt)
+for x in [0,1,1,0,1,0]:
+      pred=model5.predict(np.array([[x]]))
+      print(f"Sklearn Prediction for input {x}: {pred[0]}")      
 
-X_dt = np.array([[0, 0],
-                 [0, 1],
-                 [1, 0],
-                 [1, 1]])
-y_dt = np.array([0, 0, 1, 1])
-tree_model=fit(X_dt,y_dt)
-print(tree_model)  
+
+
+
 

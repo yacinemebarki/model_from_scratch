@@ -197,10 +197,13 @@ class decision_tree(model):
     def print_tree(self):
         from decision_tree_algorithm import print_tree
         print_tree(self.root)
-    def predict_one(self, root, x):
+    def predict(self,root,x):
+        if root is None:
+        
+            return
         if len(np.unique(root.lable)) == 1:
             return root.lable[0]
         if x == 0:
-            return self.predict_one(root.left, x)
+            return self.predict(root.left, x)
         else:
-            return self.predict_one(root.right, x)
+            return self.predict(root.right, x)
