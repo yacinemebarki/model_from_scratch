@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 import math
 import numpy as np
-from decision_tree_algorithm import fit
+from decision_tree_algorithm import fit_tree
+from softmax_regressor import fit_softmax
+
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 def softmax(z):
@@ -192,7 +194,7 @@ class decision_tree(model):
     def __init__(self,root=None):
         self.root=root
     def fit(self,x,y):
-        self.root=fit(x,y)
+        self.root=fit_tree(x,y)
         return self.root
     def print_tree(self):
         from decision_tree_algorithm import print_tree
@@ -228,3 +230,19 @@ class decision_tree_regression(model):
             return self.predict(root.left, x)
         else:
             return self.predict(root.right, x)        
+#softmax regression
+class softmax_regression(model):
+    def __init__(self,weights=None,bias=None):
+        self.weights=weights
+        self.bias=bias
+    def fit(self,x,y,learning_rate=0.01,epochs=1000):
+        
+        self.weights,self.bias=fit_softmax(x,y,learning_rate,epochs)
+        return self.weights,self.bias
+    def predict(self,x):
+        x=np.array(x)
+        n_samples=x.shape[0]
+        z=np.dot(x, self.weights) + self.bias
+        p=softmax(z)
+        predictions=np.argmax(p, axis=1)
+        return predictions

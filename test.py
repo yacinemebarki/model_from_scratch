@@ -93,6 +93,7 @@ print(y_pred_pr)
 tree_model=my_models.decision_tree()
 X_dt = np.array([1,0,0,1,1,0,1,0])
 y_dt = np.array([0,0,1,1,1,0,1,0])
+X_dt=X_dt.reshape(-1,1)
 tree_model.fit(X_dt,y_dt)
 tree_model.print_tree()
 for x in [0,1,1,0,1,0]:
@@ -113,7 +114,14 @@ for x in [2.5,4.5,6.5,8.5]:
     pred=tree_reg.predict(tree_reg.root,x)
     print(f"Regression Prediction for input {x}: {pred}")               
 
-
+sof_model=my_models.softmax_regression()
+X_sof = np.array([[1,2],[1,0],[0,1],[0,0],[2,1],[2,2]])
+y_sof = np.array([0,0,1,1,2,2])
+sof_model.fit(X_sof,y_sof)
+print("Softmax model weights:\n",sof_model.weights)
+print("Softmax model bias:\n",sof_model.bias)
+y_sof_pred=sof_model.predict(X_sof)
+print("Softmax model predictions:\n",y_sof_pred)
 
 
 

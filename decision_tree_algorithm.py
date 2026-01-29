@@ -54,7 +54,7 @@ def information_gain(parent_fea,y_lab):
     ig = entropy(y_lab) - p0 * entropy(left_y) - p1 * entropy(right_y)
     return ig, left_x, left_y, right_x, right_y
                         
-def fit(x,y):
+def fit_tree(x,y):
     if len(x)==0 or len(y)==0:
         raise ValueError("empty array")
     if len(x)!=len(y):
