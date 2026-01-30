@@ -9,7 +9,9 @@ def fit_softmax(x,y,learning_rate=0.01,epochs=1000):
     n_classes=len(np.unique(y))
     b=np.zeros(n_classes)
     w=np.random.randn(n_features,n_classes)*0.01
-    Y=np.zeros((n_samples,n_classes))
+    
+    y = np.array(y)
+    Y=np.eye(n_classes)[y]
     z=[]
     p=[]
     loss=0
