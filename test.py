@@ -122,6 +122,17 @@ print("Softmax model weights:\n",sof_model.weights)
 print("Softmax model bias:\n",sof_model.bias)
 y_sof_pred=sof_model.predict(X_sof)
 print("Softmax model predictions:\n",y_sof_pred)
-
+#test neural network
+nn_model=my_models.neural_network_model()
+X_nn = np.array([[0,0],[0,1],[1,0],[1,1]])
+y_nn = np.array([0,1,1,0])
+nn_model.fit(X_nn,y_nn,learning_rate=0.1,n_layer=2,n_neurons=[2,2],epochs=1000)
+print("Neural Network model weights:\n",nn_model.weights)
+print("Neural Network model biases:\n",nn_model.biases)
+print("Neural Network output layer weights:\n",nn_model.w_out)
+print("Neural Network output layer bias:\n",nn_model.b_out)
+y_nn_pred=nn_model.predict(X_nn)
+print("Neural Network model predictions:\n",y_nn_pred)
+  
 
 

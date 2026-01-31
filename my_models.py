@@ -3,12 +3,13 @@ import math
 import numpy as np
 from decision_tree_algorithm import fit_tree
 from softmax_regressor import fit_softmax
+from neurel_network import neural_network,sigmoid_derivative
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 def softmax(z):
-    exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
-    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+    exp_z = np.exp(z - np.max(z, ))
+    return exp_z / np.sum(exp_z, )
 class scaler:
     def __init__(self):
         self.min=None
@@ -246,3 +247,31 @@ class softmax_regression(model):
         p=softmax(z)
         predictions=np.argmax(p, axis=1)
         return predictions
+#neural network
+class neural_network_model(model):
+    def __init__ (self,weights=None,biases=None,w_out=None,b_out=None):
+        self.weights=weights
+        self.biases=biases
+        self.w_out=w_out
+        self.b_out=b_out
+    def fit(self,x,y,learning_rate=0.01,n_layer=2,n_neurons=[5,5],epochs=1000):
+        self.weights,self.biases,self.w_out,self.b_out=neural_network(x,y,learning_rate,n_layer,n_neurons,epochs)
+        return self.weights,self.biases,self.w_out,self.b_out
+    def predict(self,x):
+        x=np.array(x)
+        n_features=x.shape[1]
+        n_samples=x.shape[0]
+        A=[]
+        for t in range(n_samples):
+            a_prev=x[t]
+            for j in range(len(self.weights)):
+                w=self.weights[j]
+                b=self.biases[j]
+                z=a_prev @ w +b
+                a=sigmoid(z)
+                a_prev=a
+            z=a_prev @ self.w_out + self.b_out
+            p=softmax(z)
+            A.append(p)
+        return np.argmax(np.array(A), axis=1),np.array(A)    
+           

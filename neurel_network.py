@@ -1,6 +1,7 @@
 import numpy as np
 from softmax_regressor import softmax
-from my_models import sigmoid
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 def sigmoid_derivative(z):
     s = sigmoid(z)
     return s * (1 - s)
