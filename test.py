@@ -133,6 +133,14 @@ print("Neural Network output layer weights:\n",nn_model.w_out)
 print("Neural Network output layer bias:\n",nn_model.b_out)
 y_nn_pred=nn_model.predict(X_nn)
 print("Neural Network model predictions:\n",y_nn_pred)
-  
+#test k-means
+kmeans_model=my_models.k_means_model()
+X_km = np.array([[1,2],[1,4],[1,0],[4,2],[4,4],[4,0]])
+k=2
+labels,centroids=kmeans_model.fit(X_km,4,max_iters=10)
+print("K-means model labels:\n",labels)
+print("K-means model centroids:\n",centroids)
+y_km_pred=kmeans_model.predict(X_km)
+print("K-means model predictions:\n",y_km_pred)   
 
 

@@ -4,6 +4,7 @@ import numpy as np
 from decision_tree_algorithm import fit_tree
 from softmax_regressor import fit_softmax
 from neurel_network import neural_network,sigmoid_derivative
+from k_means import k_means
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
@@ -274,4 +275,25 @@ class neural_network_model(model):
             p=softmax(z)
             A.append(p)
         return np.argmax(np.array(A), axis=1),np.array(A)    
-           
+#k-means clustering
+class k_means_model(model):
+    def __init__(self,labels=None,centroids=None):
+        self.labels=labels
+        self.centroids=centroids
+    def fit(self,x,k,max_iters=10):
+        self.labels,self.centroids=k_means(x,k,max_iters)
+        return self.labels,self.centroids
+    def predict(self,x):
+        n_samples=x.shape[0]
+        labels=np.zeros(n_samples)
+        for j in range(n_samples):
+            distances=np.linalg.norm(x[j]-self.centroids[0])
+            cluster=0
+            for c in range(1,len(self.centroids)):
+                dist=np.linalg.norm(x[j]-self.centroids[c])
+                if dist<distances:
+                    distances=dist
+                    cluster=c
+            labels[j]=cluster
+        return labels
+
