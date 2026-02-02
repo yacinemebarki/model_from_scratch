@@ -88,13 +88,3 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
                         bias=np.zeros(n_class)
                         l.weight=weight
                         l.bias=bias 
-
-
-                            
-
-                    
-
-
-                
-
-
