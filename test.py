@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from TFIDf import TFIDF
+from connn import layer, kernel_conv,relu,relu_derivative,cnn,cnn_predict
 print(my_models.__file__)
 
 
@@ -141,6 +142,16 @@ labels,centroids=kmeans_model.fit(X_km,4,max_iters=10)
 print("K-means model labels:\n",labels)
 print("K-means model centroids:\n",centroids)
 y_km_pred=kmeans_model.predict(X_km)
-print("K-means model predictions:\n",y_km_pred)   
+print("K-means model predictions:\n",y_km_pred)
+#test cnn
+X_cnn = np.random.randn(10,5,5)
+y_cnn = np.random.randint(0,2,size=(10,))
+conv_layer=layer(type="conv",kernels=[kernel_conv(np.random.randn(3,3),np.random.randn(3,3)*0.01,0.0) for _ in range(2)],stride=1)
+pool_layer=layer(type="maxpool",pool_size=np.array([2,2]),stride=2)
+flatten_layer=layer(type="flatten",n_neurons=10)
+model_cnn=my_models.cnn_model(layers=[conv_layer,pool_layer,flatten_layer],weights=None,biases=None,w_out=None,b_out=None)
+model_cnn.fit(X_cnn,y_cnn,learning_rate=0.01,epochs=10)
+y_cnn_pred=model_cnn.predict(X_cnn)
+print("CNN model predictions:\n",y_cnn_pred)   
 
 
