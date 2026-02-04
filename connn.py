@@ -8,30 +8,32 @@ class layer:
     def __init__(self):
         self.layers=[]
     class conv:
-        def __init__(self,n_kernel,kernel_size,stride,input_shape):
+        def __init__(self,n_kernel,kernel_size,stride,input_shape,input):
             self.n_kernel=n_kernel
             self.kernel_size=kernel_size
             self.stride=stride
             self.input_shape=input_shape
             self.kernels=[]
+            self.input=input
             self.type="conv"
             for _ in range(n_kernel):
                 weight=np.random.randn(kernel_size[0],kernel_size[1])*0.01
                 bias=0
                 kern=kernel(weight,bias)
                 self.kernels.append(kern)
-    def add_conv(self,n_kernel,kernel_size,stride,input_shape):
-        conv_layer=self.conv(n_kernel,kernel_size,stride,input_shape)
+    def add_conv(self,n_kernel,kernel_size,stride,input_shape,input=None):
+        conv_layer=self.conv(n_kernel,kernel_size,stride,input_shape,input)
         self.layers.append(conv_layer)            
 
     class flatten:
-        def __init__(self,n_neurons,weight,bias):
+        def __init__(self,n_neurons,weight,bias,input):
             self.weight=None
             self.bias=None
             self.n_neurons=n_neurons
             self.type="flatten"
+            self.input=input
     def add_flatten(self,n_neurons):
-        flatten_layer=self.flatten(n_neurons,None,None)
+        flatten_layer=self.flatten(n_neurons,None,None,None)
         self.layers.append(flatten_layer)
     class maxpool:
         def __init__(self,pool_size,stride,weight,bias):
@@ -65,10 +67,25 @@ def kernel_conv(data,kern,stride):
     for i in range(H):
         for j in range(W):
             patch=data[i*stride:i*stride+kern.weight.shape[0],j*stride:j*stride+kern.weight.shape[1]]
-            conv=np.sum(patch * kern.weight[:,:,None]) + kern.bias
+            conv=np.sum(patch * kern.weight[:,:]) + kern.bias
             out[i,j]=relu(conv)
     return  out        
-                
+def Maxpool(data,pool_size,stride):
+    if len(data.shape)==3:
+        H,W,C=data.shape
+    else:
+        H,W=data.shape
+        C=1
+        data=data.reshape(H,W,1)
+    H=(data.shape[0]-pool_size[0])//stride +1
+    W=(data.shape[1]-pool_size[1])//stride +1
+    out=np.zeros((H,W,C))
+    for  c in range(C):
+        for i in range(H):
+            for j in range(W):
+                patch=data[i*stride:i*stride+pool_size[0],j*stride:j*stride+pool_size[1],c]
+                out[i,j,c]=np.max(patch)
+    return out      
                 
 
 
@@ -87,29 +104,25 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
     for epoch in range(epochs):
         loss=0
         for t in range(n_samples):
-            A=[]
+           
             Z=[]
-            Aconv=[]
+            
             a=x[t]
             for l in model.layers:
                 if l.type=="conv":
                     out=[]
-                    Aconv.append(a.copy())
+                    l.input=a.copy()
                     for kern in l.kernels:
                         out.append(kernel_conv(a,kern,l.stride))
                     a=np.array(out)
+                    if t==0 and epoch==0:
+                        print(l.kernels[0].weight)
                     
                         
                 elif l.type=="maxpool":
                     if len(a.shape)==2:
-                        h=(a.shape[0] - l.pool_size[0]) // l.stride + 1
-                        w=(a.shape[1] - l.pool_size[1]) // l.stride +1
-                        output=np.zeros((h,w))
-                        for i in range(0,a.shape[0]):
-                            for j in range(0,a.shape[1]):
-                                patch=a[i*l.stride:i*l.stride+l.pool_size.shape[0],j*l.stride:j*l.stride+l.pool_size.shape[1]]
-                                output[i,j]=np.max(patch)
-                        a=output
+                        a=Maxpool(a,l.pool_size,l.stride)
+                       
                     elif len(a.shape)==3:
                         output=np.zeros((a.shape[0],
                                          (a.shape[1] - l.pool_size[0]) // l.stride + 1,
@@ -123,6 +136,7 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
 
                 elif l.type=="flatten":
                     a=a.reshape(-1)
+                    l.input=a.copy()
                     if epoch==0 and t==0:
                         n_flatten_layers+=1
 
@@ -137,9 +151,9 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
 
                     z=a@l.weight+l.bias
                     a=sigmoid(z)
-                    A.append(a.copy())
                     Z.append(z)
             if epoch==0 and t==0:
+                
                 w_out=np.random.randn(l.n_neurons,n_class)*0.01
                 b_out=np.zeros(n_class)
                 flatten_weights.append(w_out)
@@ -149,35 +163,35 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
             
             loss+=-np.sum(y_onehot[t]*np.log(a_out+1e-8))
             d_out=a_out - y_onehot[t]
-            dw_out=np.outer(A[-1],d_out)
+            fc_input = a.reshape(-1) if model.layers[-1].type=="flatten" else model.layers[-1].input
+            dw_out=np.outer(fc_input,d_out)
+
             db_out=d_out
             
             dA_prev=d_out @ w_out.T
             dw=[0]*n_flatten_layers
             db=[0]*n_flatten_layers
-            idx_conv=len(Aconv)-1
+            
             idx_flat=len(Z)-1
             for j in reversed(range(len(model.layers))):
                 
                 if j==0:
                     a_prev=x[t]
-                else:
-                    if model.layers[j-1].type=="flatten":
-                        a_prev=A[idx_flat]
-                    elif model.layers[j-1].type=="conv":
-                        a_prev=Aconv[idx_conv]
+                
+                    
+
                     
 
                 
                 if model.layers[j].type=="flatten":
                     dZ=dA_prev*sigmoid_derivative(Z[idx_flat])
-                    dw[idx_flat]=np.outer(a_prev,dZ)
+                    dw[idx_flat]=np.outer(model.layers[j].input,dZ)
                     db[idx_flat]=dZ
                     dA_prev=dZ @ model.layers[j].weight.T
                     idx_flat-=1
 
                 elif model.layers[j].type=="conv":
-                    a_inp=Aconv[idx_conv]
+                    a_inp=model.layers[j].input
                     dA_inp=np.zeros_like(a_inp)
                     
                     for k,kern in enumerate(model.layers[j].kernels):
@@ -197,7 +211,7 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
                                 dbk+=dz_out
                         kern.weight-=learning_rate*dk
                         kern.bias-=learning_rate*dbk
-                    idx_conv-=1
+                    
 
 
 
@@ -213,7 +227,8 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
     return model,w_out,b_out  
 def cnn_predict(x,model,w_out,b_out):
     x=np.array(x)
-    x = np.expand_dims(x, axis=-1)
+    if len(x.shape)==3:
+        x = np.expand_dims(x, axis=-1)
     n_samples,n_hight,n_width,channels=x.shape
     n_class=w_out.shape[1]
     predictions=[]
@@ -226,34 +241,18 @@ def cnn_predict(x,model,w_out,b_out):
                     out.append(kernel_conv(a,kern,l.stride))
                 a=np.array(out)
             elif l.type=="maxpool":
-                if len(a.shape)==2:
-                    h=(a.shape[0] - l.pool_size[0]) // l.stride + 1
-                    w=(a.shape[1] - l.pool_size[1]) // l.stride +1
-                    output=np.zeros((h,w))
-                    for i in range(0,a.shape[0]):
-                        for j in range(0,a.shape[1]):
-                            patch=a[i*l.stride:i*l.stride+l.pool_size.shape[0],j*l.stride:j*l.stride+l.pool_size.shape[1]]
-                            output[i,j]=np.max(patch)
-                    a=output
-                elif len(a.shape)==3:
-                    for d in range(a.shape[0]):
-                        for i in range(0,a.shape[1]):
-                            for j in range(0,a.shape[2]):
-                                patch=a[d,i*l.stride:i*l.stride+l.pool_size.shape[0],j*l.stride:j*l.stride+l.pool_size.shape[1]]
-                                output[d,i,j]=np.max(patch)
-                    a=output            
-            elif l.type=="flatten":
+                
+                a=Maxpool(a,l.pool_size,l.stride)
+            elif l.type=="flatten": 
                 a=a.reshape(-1)
-                a=sigmoid(a @ l.weight + l.bias)
+                z=a @ l.weight + l.bias
+                a=sigmoid(z)
         z_out=a @ w_out + b_out
         a_out=softmax(z_out)
-        predictions.append(np.argmax(a_out))
+        pred=np.argmax(a_out)
+        predictions.append(pred)
     return np.array(predictions)
-
-
-
-            
-
+    
             
 
     
