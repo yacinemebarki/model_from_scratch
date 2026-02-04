@@ -16,7 +16,7 @@ class layer:
             self.kernels=[]
             self.type="conv"
             for _ in range(n_kernel):
-                weight=np.random.randn(kernel_size,kernel_size)*0.01
+                weight=np.random.randn(kernel_size[0],kernel_size[1])*0.01
                 bias=0
                 kern=kernel(weight,bias)
                 self.kernels.append(kern)
@@ -30,8 +30,8 @@ class layer:
             self.bias=None
             self.n_neurons=n_neurons
             self.type="flatten"
-    def add_flatten(self):
-        flatten_layer=self.flatten()
+    def add_flatten(self,n_neurons):
+        flatten_layer=self.flatten(n_neurons,None,None)
         self.layers.append(flatten_layer)
     class maxpool:
         def __init__(self,pool_size,stride,weight,bias):
@@ -41,7 +41,7 @@ class layer:
             self.stride=stride
             self.type="maxpool"
     def add_maxpool(self,pool_size,stride):
-        maxpool_layer=self.maxpool(pool_size,stride)
+        maxpool_layer=self.maxpool(pool_size,stride,None,None)
         self.layers.append(maxpool_layer)            
 
 
@@ -52,13 +52,22 @@ def relu_derivative(x):
 
 
 def kernel_conv(data,kern,stride):
-    out=[]
-    for i in range(0,data.shape[0]):
-        for j in range(0,data.shape[1]):
+    if len(data.shape)==3:
+        H,W,C=data.shape
+    else :
+        H,W=data.shape
+        C=1
+        data=data.reshape(H,W,1)    
+    
+    H=(data.shape[0]-kern.weight.shape[0])//stride +1
+    W=(data.shape[1]-kern.weight.shape[1])//stride +1
+    out=np.zeros((H,W))
+    for i in range(H):
+        for j in range(W):
             patch=data[i*stride:i*stride+kern.weight.shape[0],j*stride:j*stride+kern.weight.shape[1]]
-            conv=np.sum(patch * kern.weight) + kern.bias
-            out.append(relu(conv))
-    return  np.array(out).reshape(( (data.shape[0]-kern.weight.shape[0])//stride +1 , (data.shape[1]-kern.weight.shape[1])//stride +1 ))        
+            conv=np.sum(patch * kern.weight[:,:,None]) + kern.bias
+            out[i,j]=relu(conv)
+    return  out        
                 
                 
 
@@ -66,7 +75,8 @@ def kernel_conv(data,kern,stride):
 def cnn(x,y,model,learning_rate=0.01,epochs=1000):
     x=np.array(x)
     y=np.array(y)
-    x = np.expand_dims(x, axis=-1)
+    if len(x.shape)==3:
+        x = np.expand_dims(x, axis=-1)
     n_samples,n_hight,n_width,channels=x.shape
     n_class=len(np.unique(y))
     y_onehot=np.eye(n_class)[y]
@@ -101,10 +111,13 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
                                 output[i,j]=np.max(patch)
                         a=output
                     elif len(a.shape)==3:
+                        output=np.zeros((a.shape[0],
+                                         (a.shape[1] - l.pool_size[0]) // l.stride + 1,
+                                         (a.shape[2] - l.pool_size[1]) // l.stride + 1))
                         for d in range(a.shape[0]):
-                            for i in range(0,a.shape[1]):
-                                for j in range(0,a.shape[2]):
-                                    patch=a[d,i*l.stride:i*l.stride+l.pool_size.shape[0],j*l.stride:j*l.stride+l.pool_size.shape[1]]
+                            for i in range(0,output.shape[1]):
+                                for j in range(0,output.shape[2]):
+                                    patch=a[d,i*l.stride:i*l.stride+l.pool_size[0],j*l.stride:j*l.stride+l.pool_size[1]]
                                     output[d,i,j]=np.max(patch)
                         a=output            
 
@@ -114,7 +127,7 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
                         n_flatten_layers+=1
 
                         
-                        weight=np.random.randn(a.shape[0]*a.shape[1],l.n_neurons)*0.01
+                        weight=np.random.randn(a.size,l.n_neurons)*0.01
                         bias=np.zeros(l.n_neurons)
                         l.weight=weight
                         l.bias=bias
@@ -124,7 +137,7 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
 
                     z=a@l.weight+l.bias
                     a=sigmoid(z)
-                    A.append(a)
+                    A.append(a.copy())
                     Z.append(z)
             if epoch==0 and t==0:
                 w_out=np.random.randn(l.n_neurons,n_class)*0.01
@@ -142,44 +155,59 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
             dA_prev=d_out @ w_out.T
             dw=[0]*n_flatten_layers
             db=[0]*n_flatten_layers
-            idx=0
-            idx = 0
+            idx_conv=len(Aconv)-1
+            idx_flat=len(Z)-1
             for j in reversed(range(len(model.layers))):
-                if model.layers[j].type == "flatten":
-                    dZ = dA_prev * sigmoid_derivative(Z[j])
-                if j == 0:
-                    dw[j] = np.outer(a, dZ)
+                
+                if j==0:
+                    a_prev=x[t]
                 else:
-                    dw[j] = np.outer(A[j-1], dZ)
-                db[j] = dZ
-                dA_prev = dZ @ model.layers[j].weight.T
-                if model.layers[j].type == "conv":
-                    a_input = Aconv[idx]  
-                    for k_idx, kern in enumerate(model.layers[j].kernels):
-                        H_out = (a_input.shape[0] - kern.weight.shape[0]) // model.layers[j].stride + 1
-                        W_out = (a_input.shape[1] - kern.weight.shape[1]) // model.layers[j].stride + 1
-                        grad = dA_prev[k_idx] if len(dA_prev.shape) == 2 else np.ones((H_out, W_out))
-                        dK = np.zeros_like(kern.weight)
-                        db = 0
-                        for i in range(H_out):
-                            for c in range(W_out):
-                                patch = a_input[i*model.layers[j].stride:i*model.layers[j].stride+kern.weight.shape[0],
-                                            c*model.layers[j].stride:c*model.layers[j].stride+kern.weight.shape[1]]
-                                z = np.sum(patch * kern.weight) + kern.bias
-                                dZ_conv = grad[i, c] * relu_derivative(z)
-                                dK += patch * dZ_conv
-                                db += dZ_conv
+                    if model.layers[j-1].type=="flatten":
+                        a_prev=A[idx_flat]
+                    elif model.layers[j-1].type=="conv":
+                        a_prev=Aconv[idx_conv]
+                    
 
-                    kern.weight -= learning_rate * dK
-                    kern.bias -= learning_rate * db
-                    idx += 1
+                
+                if model.layers[j].type=="flatten":
+                    dZ=dA_prev*sigmoid_derivative(Z[idx_flat])
+                    dw[idx_flat]=np.outer(a_prev,dZ)
+                    db[idx_flat]=dZ
+                    dA_prev=dZ @ model.layers[j].weight.T
+                    idx_flat-=1
+
+                elif model.layers[j].type=="conv":
+                    a_inp=Aconv[idx_conv]
+                    dA_inp=np.zeros_like(a_inp)
+                    
+                    for k,kern in enumerate(model.layers[j].kernels):
+                        kh,kw=kern.weight.shape
+                        H=(a_inp.shape[1]-kh)//model.layers[j].stride +1
+                        W=(a_inp.shape[2]-kw)//model.layers[j].stride +1
+                        dk=np.zeros(kern.weight.shape)
+                        dbk=0
+                        
+                        for i in range(H):
+                            for m in range(W):
+                                patch=a_inp[k,i*model.layers[j].stride:i*model.layers[j].stride+kh,
+                                             m*model.layers[j].stride:m*model.layers[j].stride+kw]
+                                conv_out=np.sum(patch * kern.weight) + kern.bias
+                                dz_out=relu_derivative(conv_out)
+                                dk+=patch*dz_out
+                                dbk+=dz_out
+                        kern.weight-=learning_rate*dk
+                        kern.bias-=learning_rate*dbk
+                    idx_conv-=1
 
 
+
+                
+            idx=0
             for j in range(len(model.layers)):
                 if model.layers[j].type=="flatten":
-                    model.layers[j].weight -= learning_rate * dw[j]
-                    model.layers[j].bias -= learning_rate * db[j]
-                
+                    model.layers[j].weight -= learning_rate * dw[idx]
+                    model.layers[j].bias -= learning_rate * db[idx]
+                    idx+=1
             w_out -= learning_rate * dw_out
             b_out -= learning_rate * db_out
     return model,w_out,b_out  
@@ -221,6 +249,8 @@ def cnn_predict(x,model,w_out,b_out):
         a_out=softmax(z_out)
         predictions.append(np.argmax(a_out))
     return np.array(predictions)
+
+
 
             
 
