@@ -155,6 +155,7 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
             if epoch==0 and t==0:
                 
                 w_out=np.random.randn(l.n_neurons,n_class)*0.01
+                print(w_out)
                 b_out=np.zeros(n_class)
                 flatten_weights.append(w_out)
                 flatten_biases.append(b_out)
@@ -174,44 +175,59 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
             
             idx_flat=len(Z)-1
             for j in reversed(range(len(model.layers))):
-                
-                if j==0:
-                    a_prev=x[t]
-                
-                    
+    
+                layer_type = model.layers[j].type
 
-                    
+    
+                if j == 0:
+                    a_prev = x[t]
 
-                
-                if model.layers[j].type=="flatten":
-                    dZ=dA_prev*sigmoid_derivative(Z[idx_flat])
-                    dw[idx_flat]=np.outer(model.layers[j].input,dZ)
-                    db[idx_flat]=dZ
-                    dA_prev=dZ @ model.layers[j].weight.T
-                    idx_flat-=1
-
-                elif model.layers[j].type=="conv":
-                    a_inp=model.layers[j].input
-                    dA_inp=np.zeros_like(a_inp)
+                if layer_type == "flatten":
                     
-                    for k,kern in enumerate(model.layers[j].kernels):
-                        kh,kw=kern.weight.shape
-                        H=(a_inp.shape[1]-kh)//model.layers[j].stride +1
-                        W=(a_inp.shape[2]-kw)//model.layers[j].stride +1
-                        dk=np.zeros(kern.weight.shape)
-                        dbk=0
+                    dZ = dA_prev * sigmoid_derivative(Z[idx_flat])
+                    dw[idx_flat] = np.outer(model.layers[j].input, dZ)
+                    db[idx_flat] = dZ
+                    dA_prev = dZ @ model.layers[j].weight.T
+                    idx_flat -= 1
+                    print(f"flatten layer {j} updated at epoch {epoch}")
+
+                elif layer_type == "conv":
+                    a_inp = model.layers[j].input  
+                    dA_prev_conv = np.zeros_like(a_inp)
+
+                   
+                    for k, kern in enumerate(model.layers[j].kernels):
+                        kh, kw = kern.weight.shape
+                        H_out = (a_inp.shape[1] - kh) // model.layers[j].stride + 1
+                        W_out = (a_inp.shape[2] - kw) // model.layers[j].stride + 1
+                        dk = np.zeros_like(kern.weight)
+                        dbk = 0
+
+                        for i in range(H_out):
+                            for j_ in range(W_out):
+                                
+                                patch = a_inp[:, 
+                                              i*model.layers[j].stride:i*model.layers[j].stride+kh,
+                                              j_*model.layers[j].stride:j_*model.layers[j].stride+kw]
+
+                                
+                                dz = dA_prev[k, i, j_] * relu_derivative(np.sum(patch * kern.weight) + kern.bias)
+
+                                dk += patch * dz
+                                dbk += dz
+                                
+                                dA_prev_conv[:, 
+                                             i*model.layers[j].stride:i*model.layers[j].stride+kh,
+                                             j_*model.layers[j].stride:j_*model.layers[j].stride+kw] += kern.weight * dz
+
                         
-                        for i in range(H):
-                            for m in range(W):
-                                patch=a_inp[k,i*model.layers[j].stride:i*model.layers[j].stride+kh,
-                                             m*model.layers[j].stride:m*model.layers[j].stride+kw]
-                                conv_out=np.sum(patch * kern.weight) + kern.bias
-                                dz_out=relu_derivative(conv_out)
-                                dk+=patch*dz_out
-                                dbk+=dz_out
-                        kern.weight-=learning_rate*dk
-                        kern.bias-=learning_rate*dbk
-                    
+                        kern.weight -= learning_rate * dk
+                        kern.bias -= learning_rate * dbk
+
+                        
+                        dA_prev = dA_prev_conv
+                        print(f"conv layer {j} updated at epoch {epoch}")
+
 
 
 
@@ -224,6 +240,7 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
                     idx+=1
             w_out -= learning_rate * dw_out
             b_out -= learning_rate * db_out
+            print(epoch)
     return model,w_out,b_out  
 def cnn_predict(x,model,w_out,b_out):
     x=np.array(x)
