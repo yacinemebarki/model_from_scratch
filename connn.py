@@ -100,28 +100,39 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
     flatten_weights=[]
     flatten_biases=[]
     n_flatten_layers=0
+    print(n_samples)
    
     for epoch in range(epochs):
         loss=0
+    
         for t in range(n_samples):
            
             Z=[]
             
             a=x[t]
+            print("the input shape first ",a.shape[2])
+            s=0
             for l in model.layers:
                 if l.type=="conv":
                     out=[]
                     l.input=a.copy()
+                    print("conv",s)
+                    s=s+1
                     for kern in l.kernels:
                         out.append(kernel_conv(a,kern,l.stride))
                     a=np.array(out)
+                    print("the outupot of conv layer",a)
                     if t==0 and epoch==0:
                         print(l.kernels[0].weight)
                     
                         
                 elif l.type=="maxpool":
+                    
                     if len(a.shape)==2:
                         a=Maxpool(a,l.pool_size,l.stride)
+                        print("maxpool",s)
+                        s=s+1
+                        
                        
                     elif len(a.shape)==3:
                         output=np.zeros((a.shape[0],
@@ -132,11 +143,15 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
                                 for j in range(0,output.shape[2]):
                                     patch=a[d,i*l.stride:i*l.stride+l.pool_size[0],j*l.stride:j*l.stride+l.pool_size[1]]
                                     output[d,i,j]=np.max(patch)
-                        a=output            
+                        a=output 
+                        print("maxpool",s)
+                        s=s+1           
 
                 elif l.type=="flatten":
                     a=a.reshape(-1)
                     l.input=a.copy()
+                    print("flatt",s)
+                    s=s+1
                     if epoch==0 and t==0:
                         n_flatten_layers+=1
 
@@ -177,10 +192,10 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
             for j in reversed(range(len(model.layers))):
     
                 layer_type = model.layers[j].type
+                print(layer_type)
 
     
-                if j == 0:
-                    a_prev = x[t]
+                
 
                 if layer_type == "flatten":
                     
@@ -199,30 +214,43 @@ def cnn(x,y,model,learning_rate=0.01,epochs=1000):
                     for k, kern in enumerate(model.layers[j].kernels):
                         kh, kw = kern.weight.shape
                         H_out = (a_inp.shape[1] - kh) // model.layers[j].stride + 1
+                        print("the inputshape",a_inp.shape[2])
+                        
                         W_out = (a_inp.shape[2] - kw) // model.layers[j].stride + 1
+                        
                         dk = np.zeros_like(kern.weight)
                         dbk = 0
+                        print("enter to the kernel")
+                        print("hieght",H_out)
+                        print("width",W_out)
+
 
                         for i in range(H_out):
-                            for j_ in range(W_out):
+                            for c in range(W_out):
                                 
-                                patch = a_inp[:, 
-                                              i*model.layers[j].stride:i*model.layers[j].stride+kh,
-                                              j_*model.layers[j].stride:j_*model.layers[j].stride+kw]
+                                patch = a_inp[k, 
+                                              i*model.layers[c].stride:i*model.layers[c].stride+kh,
+                                              c*model.layers[c].stride:c*model.layers[c].stride+kw]
+                                print("patch",patch)
 
                                 
-                                dz = dA_prev[k, i, j_] * relu_derivative(np.sum(patch * kern.weight) + kern.bias)
+                                dz = dA_prev[k, i, c] * relu_derivative(np.sum(patch * kern.weight) + kern.bias)
+                                print("dz",dz)
+                            
 
                                 dk += patch * dz
                                 dbk += dz
                                 
                                 dA_prev_conv[:, 
-                                             i*model.layers[j].stride:i*model.layers[j].stride+kh,
-                                             j_*model.layers[j].stride:j_*model.layers[j].stride+kw] += kern.weight * dz
+                                             i*model.layers[t].stride:i*model.layers[t].stride+kh,
+                                             t*model.layers[t].stride:t*model.layers[t].stride+kw] += kern.weight * dz
+                                
 
                         
                         kern.weight -= learning_rate * dk
                         kern.bias -= learning_rate * dbk
+                        print(dk)
+                        print(dbk)
 
                         
                         dA_prev = dA_prev_conv
