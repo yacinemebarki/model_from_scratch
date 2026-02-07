@@ -1,6 +1,8 @@
 import numpy as np
 def relu(input):
     return np.maximum(0,input)
+def relu_derivative(x):
+    return np.where(x > 0, 1, 0)
 class kernel:
     def __init__(self,size,weight,bias):
         self.weight=weight
@@ -26,21 +28,48 @@ class conv:
         output=[]
         H=(self.input_shape[0]-self.kernel_size[0])//self.stride +1
         W=(self.input_shape[1]-self.kernel_size[1])//self.stride +1
+        self.z=[]
         for ker in self.kernels :
             
             
             
             out=np.zeros((H,W))
-             
+            z_map=np.zeros((H,W)) 
             
             for i in  range(H):
                 for j in range(W):
                     patch=self.input[i*self.stride:i*self.stride+self.kernel_size[0],j*self.stride:j*self.stride+self.kernel_size[1],:]
                     conv=np.sum(patch*ker.weight)+ker.bias
+                    z_map[i,j]=conv
                     out[i,j]=relu(conv)
             output.append(out)
+            self.z.append(z_map)
         self.output=output
-        return output                
+        return output 
+    def backdrop(self,dout,lr):
+        H=(self.input_shape[0]-self.kernel_size[0])//self.stride +1
+        W=(self.input_shape[1]-self.kernel_size[1])//self.stride +1
+        dX = np.zeros_like(self.input)
+        for k,ker in enumerate(self.kernels):
+            dw = np.zeros_like(ker.weight)
+            db = 0
+        
+            for i in range(H):
+                for j in range(W):
+                    patch=self.input[i*self.stride:i*self.stride+self.kernel_size[0],j*self.stride:j*self.stride+self.kernel_size[1],:]
+                    dconv=dout[k,i,j]*relu_derivative(self.z[k][i,j])
+                    dw+=patch*dconv
+                    db+=dout[k,i,j]
+                    dX[i*self.stride:i*self.stride+self.kernel_size[0],j*self.stride:j*self.stride+self.kernel_size[1],:] += ker.weight * dconv
+            ker.weight-=lr*dw
+            ker.bias-=lr*db
+        return dX    
+
+
+
+
+    
+
 
         
 
