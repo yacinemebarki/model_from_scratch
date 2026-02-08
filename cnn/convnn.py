@@ -20,7 +20,7 @@ class layer :
         flattlayer=flatt()
         self.layers.append(flattlayer)
     def fit(self,x,y,learning_rate=0.01,epoches=1000):
-        x=np.array(x)
+        x=np.array(x,dtype=np.float64)
         y=np.array(y)
         n_samples=x.shape[0]
         n_class=len(np.unique(y))
@@ -30,21 +30,32 @@ class layer :
             for t in range(n_samples):
                 a=x[t]
                 for l in self.layers:
+                    if l.type=="maxpool":
+                        print("convoutput",a)
                     a=l.forward(a)
                 if t==0 and epoch==0:
+                    print(a)
                     self.wout=np.random.rand(a.size,n_class)*0.01 
                     self.bout=np.zeros(n_class)
+                    print("wout",self.wout)
                 zout= a @ self.wout +self.bout
                 aout=softmax(zout) 
                 dout=aout-y_onehot[t]
                 
                 dwout=np.outer(a,dout)
+
+                print("dout",dout)
                 daprev=dout @ self.wout.T 
                 self.wout-=learning_rate*dwout
                 self.bout-=learning_rate*dout
+                dout=daprev
+
                  
                 for l in reversed(self.layers):
+                    
                     print(l.type)
+                    print(dout.shape)
+                    print(dout)
                     dout=l.backdrop(dout,learning_rate)
 #test cnn
 x=np.array([
@@ -66,7 +77,7 @@ y=np.array([0, 1])
 model=layer()
 
 
-model.addconv(n_kernel=1, kernel_size=(3,3), input_shape=(4,4), stride=1)
+model.addconv(n_kernel=1, kernel_size=(3,3), input_shape=(4,4,1), stride=1)
 model.addmaxpool(pool_size=(2,2), stirde=2)
 model.addflatt()
 
