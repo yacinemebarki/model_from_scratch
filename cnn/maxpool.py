@@ -3,6 +3,7 @@ class maxpool:
     def __init__(self,pool_size,stirde):
         self.pool_size=pool_size
         self.stride=stirde
+        self.type="maxpool"
         
 
     def forward(self,input):
@@ -20,9 +21,9 @@ class maxpool:
                 for j in range(W):
                     patch=input[i*self.stride:i*self.stride+self.pool_size[0],j*self.stride:j*self.stride+self.pool_size[1],s] 
                     out[i,j,s]=max(patch)
-        self.output=out                
-        return out  
-    def backdrop(self,dout):
+        self.output=np.array(out)                
+        return np.array(out)  
+    def backdrop(self,dout,lr):
         dx=np.zeros(self.input.shape)     
         if len(dx.shape)==3:
             c=dx.shape[2]

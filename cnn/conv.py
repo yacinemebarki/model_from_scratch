@@ -9,12 +9,13 @@ class kernel:
         self.bias=bias
         self.size=size
 class conv:
-    def __init__(self,n_kernel,kernel_size,input_shape,stride,input):
+    def __init__(self,n_kernel,kernel_size,input_shape,stride):
         self.kernels=[]
         self.stride=stride
-        self.input=input
+        
         self.input_shape=input_shape
         self.kernel_size=kernel_size
+        self.type="conv"
         for i in range(n_kernel):
             ker=kernel(kernel_size,None,None)
             if len(input_shape)==3:
@@ -24,11 +25,13 @@ class conv:
                 ker.weight=np.random.rand(kernel_size[0],kernel_size[1])*0.01
                 ker.bias=0.0
             self.kernels.append(ker)
-    def forward(self):
+    def forward(self,input):
         output=[]
+        self.input=input
         H=(self.input_shape[0]-self.kernel_size[0])//self.stride +1
         W=(self.input_shape[1]-self.kernel_size[1])//self.stride +1
         self.z=[]
+        
         for ker in self.kernels :
             
             
@@ -44,8 +47,8 @@ class conv:
                     out[i,j]=relu(conv)
             output.append(out)
             self.z.append(z_map)
-        self.output=output
-        return output 
+        self.output=np.array(output)
+        return np.array(output) 
     def backdrop(self,dout,lr):
         H=(self.input_shape[0]-self.kernel_size[0])//self.stride +1
         W=(self.input_shape[1]-self.kernel_size[1])//self.stride +1
