@@ -26,7 +26,10 @@ class layer :
         n_samples=x.shape[0]
         n_class=len(np.unique(y))
         y_onehot=np.eye(n_class)[y]
-        x=x[..., np.newaxis]
+        if x.ndim == 3:
+            x = x[..., np.newaxis]
+
+        
         
         
         for epoch in range(epoches):
@@ -127,8 +130,8 @@ print(y_train.shape)
 print(np.unique(y_train))
 x_test=x_test[:100]
 print(len(np.unique(x_test)))
-x_train = x_train.reshape(-1, 28, 28, 1)  
-x_test  = x_test.reshape(-1, 28, 28, 1) 
+x_train = x_train.reshape(-1,28, 28, 1)  
+x_test  = x_test.reshape(-1,28, 28, 1) 
 
 x_train = x_train.astype(np.float32) / 255.0
 x_test  = x_test.astype(np.float32) / 255.0
@@ -145,7 +148,8 @@ x_test=x_test[:100]
 
 
 y_test=model2.predict(x_test)
-print(y_test)
+preds = [np.argmax(p) for p in y_test]
+print(preds)
 
 
     

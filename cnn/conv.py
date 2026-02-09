@@ -59,7 +59,7 @@ class conv:
         
             for i in range(H):
                 for j in range(W):
-                    patch=self.input[i*self.stride:i*self.stride+self.kernel_size[0],j*self.stride:j*self.stride+self.kernel_size[1],:]
+                    patch=self.input[i*self.stride:i*self.stride+self.kernel_size[0],j*self.stride:j*self.stride+self.kernel_size[1],:ker.weight.shape[2]]
                     dconv=dout[i,j,k]*relu_derivative(self.z[k][i,j])
                     dw+=patch*dconv
                     db+=dconv
