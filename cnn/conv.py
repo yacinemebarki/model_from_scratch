@@ -19,10 +19,10 @@ class conv:
         for i in range(n_kernel):
             ker=kernel(kernel_size,None,None)
             if len(input_shape)==3:
-                ker.weight=np.random.rand(kernel_size[0],kernel_size[1],input_shape[2])*0.01
+                ker.weight=np.random.rand(kernel_size[0],kernel_size[1],input_shape[2])*0.1
                 ker.bias=0.0
             else :
-                ker.weight=np.random.rand(kernel_size[0],kernel_size[1])*0.01
+                ker.weight=np.random.rand(kernel_size[0],kernel_size[1],1)*0.1
                 ker.bias=0.0
             self.kernels.append(ker)
     def forward(self,input):
@@ -47,8 +47,8 @@ class conv:
                     out[i,j]=relu(conv)
             output.append(out)
             self.z.append(z_map)
-        self.output=np.array(output)
-        return np.array(output) 
+        self.output = np.stack(output, axis=-1)  
+        return self.output 
     def backdrop(self,dout,lr):
         H=(self.input_shape[0]-self.kernel_size[0])//self.stride +1
         W=(self.input_shape[1]-self.kernel_size[1])//self.stride +1
@@ -60,9 +60,9 @@ class conv:
             for i in range(H):
                 for j in range(W):
                     patch=self.input[i*self.stride:i*self.stride+self.kernel_size[0],j*self.stride:j*self.stride+self.kernel_size[1],:]
-                    dconv=dout[k,i,j]*relu_derivative(self.z[k][i,j])
+                    dconv=dout[i,j,k]*relu_derivative(self.z[k][i,j])
                     dw+=patch*dconv
-                    db+=dout[k,i,j]
+                    db+=dconv
                     dX[i*self.stride:i*self.stride+self.kernel_size[0],j*self.stride:j*self.stride+self.kernel_size[1],:] += ker.weight * dconv
             ker.weight-=lr*dw
             ker.bias-=lr*db

@@ -11,7 +11,7 @@ class flatt:
         self.original_shape=input.shape
         
 
-        return input.reshape(-1)
+        return input.flatten()
     def backdrop(self,da,lr):
         return da.reshape(self.original_shape)
     

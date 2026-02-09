@@ -7,6 +7,7 @@ class maxpool:
         
 
     def forward(self,input):
+        print(input.shape)
         
         
         if input.ndim==2:
@@ -14,12 +15,15 @@ class maxpool:
         self.input=input    
         c=self.input.shape[2] 
         H=(self.input.shape[0]-self.pool_size[0])//self.stride +1
-        W=(self.input.shape[1]-self.pool_size[1])//self.stride +1   
+        W=(self.input.shape[1]-self.pool_size[1])//self.stride +1 
+        print("height",H)
+        print("width",W)  
         out=np.zeros((H,W,c))    
         for s in range(c):
             for i in range(H):
                 for j in range(W):
                     patch=self.input[i*self.stride:i*self.stride+self.pool_size[0],j*self.stride:j*self.stride+self.pool_size[1],s] 
+                    
                     out[i,j,s]=np.max(patch)
         self.output=np.array(out)                
         return np.array(out)  
