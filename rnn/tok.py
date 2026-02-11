@@ -74,10 +74,4 @@ vec_padd=padding(vec,5)
 print("the padding is",vec_padd)      
 tok.embedding_tran(4,5)
 result=tok.embedding(vec_padd)
-print(result)      
-            
-                                        
-                    
-                        
-
-    
+print(result)  
