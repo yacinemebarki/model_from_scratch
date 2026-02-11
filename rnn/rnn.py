@@ -8,6 +8,10 @@ class layer:
         self.b_out=None
     def addembedding(self):
         self.layers.append(tokenizer())
+
+
     def addrecun(self,H_size):
-        self.layers.append(recurent(H_size))    
+        self.layers.append(recurent(H_size))
+    def fit(self,x,y,epoches=10,learning_rate=0.01):
+                
             
