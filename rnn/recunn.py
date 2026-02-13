@@ -6,16 +6,16 @@ class recurent:
         self.bh=np.zeros(H_size)
         
         self.H_size=H_size
-        self.wh=np.random.rand(H_size,H_size)*0.01
-        self.h=np.zeros(H_size)*0.01
+        self.wh=np.random.rand(H_size,H_size)* np.sqrt(1 / H_size)
+        self.h=np.zeros(H_size)*0.01 
         self.w=None
         self.hidden.append(self.h)
         self.type="recurente"
         
     def forward(self,x):
         if len(self.hidden)==1:
-            self.w=np.random.rand(x.shape[0],self.H_size)*0.01
-        print("shapes",x.shape)    
+            self.w=np.random.rand(x.shape[0],self.H_size)*np.sqrt(1 / x.shape[0])
+           
         h_t=np.tanh(x @ self.w +self.h @ self.wh +self.bh)
         self.h=h_t
         self.hidden.append(h_t)
@@ -31,6 +31,13 @@ class recurent:
         if t>0:
             dw_h=self.hidden[t-1][:,None] @ dtan[None,:]
         dbh=dtan
+        max_norm = 5.0
+
+
+        dw_x = np.clip(dw_x, -max_norm, max_norm)
+        dw_h = np.clip(dw_h, -max_norm, max_norm)
+        dbh = np.clip(dbh, -max_norm, max_norm)
+
         self.wh-=lr*dw_h
         self.bh-=lr*dbh
         self.w-=lr*dw_x

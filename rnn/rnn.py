@@ -40,7 +40,7 @@ class layer:
                        
                 
                 if epoch==0 and t==0:
-                    self.w_out=np.random.rand(n_class,p.H_size)
+                    self.w_out=np.random.rand(n_class,p.H_size)*0.01
                     self.b_out=np.zeros(n_class)
                 z=self.w_out @ p.hidden[-1] +self.b_out
                 y_pred=np.tanh(z)
@@ -119,3 +119,66 @@ vec_pre=tok.encode(text_pre)
 vec_pre=tok.padding(vec_pre,5)
 result=model.predict(vec_pre)
 print(result)
+text_array = [
+    "I love AI",
+    "Deep learning is fun",
+    "Hello world",
+    "Python is great",
+    "RNN is powerful",
+    "I love deep learning",
+    "Machine learning is amazing",
+    "I enjoy coding in Python",
+    "Artificial intelligence is the future",
+    "Neural networks are interesting",
+    "I hate bugs in my code",
+    "Debugging is frustrating",
+    "Syntax errors are annoying",
+    "Sometimes programming is stressful",
+    "I dislike slow computers",
+    "I love solving problems",
+    "Data science is fascinating",
+    "I enjoy learning new algorithms",
+    "Training models is rewarding",
+    "I hate runtime errors",
+    "Optimization is challenging",
+    "I like experimenting with models",
+    "Python makes programming easier",
+    "I am learning deep learning",
+    "I dislike complicated setups",
+    "I enjoy clean code",
+    "Machine learning can be tricky",
+    "I love AI research",
+    "Sometimes training takes too long",
+    "I like visualizing data",
+    "RNNs can remember sequences",
+    "I hate missing semicolons",
+    "I enjoy writing functions",
+    "I dislike long debugging sessions"
+]
+
+# Binary labels: 1 = positive / interested, 0 = negative / frustrated
+labels = [
+    1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1,
+    0, 0, 0, 0, 0,
+    1, 1, 1, 1, 0,
+    0, 1, 1, 1, 0,
+    1, 0, 1, 0, 1,
+    1, 0, 1, 0
+]
+
+tok2=tokenizer()
+tok2.fit(text_array)
+vec_arr=tok2.encode(text_array)
+vec_arr=tok2.padding(vec_arr,7)
+print("the padding",vec_arr)
+
+
+model2=layer()
+model2.addembedding(tok2.wordid,7)
+model2.addrecun(5)
+model.addrecun(7)
+
+model2.fit(vec_arr,labels)
+print("model2 weights",model2.w_out)
+print("model2 biases",model2.b_out)
