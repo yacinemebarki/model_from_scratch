@@ -19,28 +19,17 @@ class tokenizer:
                     self.idx+=1
                     
     def encode(self,text):
-        text=normalization(text)
+        
         result=[]
-        for word in text:
-            if word in self.wordid:
-                result.append(self.wordid[word])
+        for te in text:
+            te=normalization(te)
+            a=[]
+            for word in te:
+                if word in self.wordid:
+                    a.append(self.wordid[word])
+            result.append(a)    
+            
         return result
-    
-    
-    def embedding_tran(self,output_dim,input_dim):
-        for word in self.wordid:
-            self.vecword[self.wordid[word]]=np.random.rand(output_dim)*0.1
-    def embedding(self,vec_text):
-        emb_vec=[]
-        for text in vec_text:
-            vec=[]
-            for word in text:
-                if word in self.vecword:
-                    vec.append(self.vecword[word])
-            emb_vec.append(vec)
-        return emb_vec            
-                    
-                
     def padding(self,text_vec,maxlen):
         result=[]
         for vec in text_vec:
@@ -53,22 +42,35 @@ class tokenizer:
             for j in range(t,maxlen):
                 v.append(vec[j-t])
             result.append(v)
-        return result 
-text_array = [
-    "I love AI",
-    "Deep learning is fun",
-    "Hello",
-    "Python is great for NLP",
-    "RNN LSTM Transformers",
-    "i love deep learning"
-]
+        return result    
+    
+class embedding:
+    def __init__(self,wordid,out_dim):
+        self.vecword={}
+        self.wordid=wordid
+        self.type="embedding" 
+        self.out_dim=out_dim   
+    def embedding_tran(self):
+        for word in self.wordid:
+            self.vecword[self.wordid[word]]=np.random.rand(self.out_dim)*0.1
+    def forward(self,vec_text):
+        
+        vec_text=np.array(vec_text)  
+
+    
+        if vec_text.ndim > 1:
+            vec_text=vec_text[0]
        
-tok=tokenizer()
-tok.fit(text_array)
-vec=[tok.encode(text) for text in text_array]
-print("tokenization",vec)
-vec_padd=tok.padding(vec,5)
-print("the padding is",vec_padd)      
-tok.embedding_tran(4,5)
-result=tok.embedding(vec_padd)
-print(result)  
+        
+        vec=[]
+        for word in vec_text:
+            if word==0:
+                vec.append(np.zeros(len(next(iter(self.vecword.values())))))
+            else :
+                vec.append(self.vecword[word])
+            
+        return np.array(vec)            
+                    
+                
+ 
+ 
