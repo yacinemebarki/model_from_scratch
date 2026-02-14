@@ -191,7 +191,7 @@ This section documents a CNN architecture implemented from scratch in Python, in
    $$
 
 🔹 **Files**  
-- Implementation: [`cnn_layers.py`](cnn_layers.py)  
+- Implementation: [`cnn_layers.py`](https://github.com/yacinemebarki/model_from_scratch/blob/main/cnn/convnn.py)  
 - Class: `layer`  
 - Methods: `addconv`, `addmaxpool`, `addflatt`, `fit`, `predict`  
 
