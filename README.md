@@ -31,15 +31,20 @@ The goal is to build a strong foundation, document each step, and provide reprod
 ---
  
 ## 🔹 Projects
+## 🔹 Projects
+
 | Model / Project | Type | Description |
 |-----------------|------|-------------|
-| [Linear Regression](#linear-regression) | ML | Predict continuous targets using a linear approach ([Code](linear_regression.py)) |
-| [Logistic Regression](#logistic-regression) | ML | Binary/multi-class classification ([Code](logistic_regression.py)) |
-| [TF-IDF](#tf-idf) | NLP | Text vectorization for ML models ([Code](tfidf.py)) |
+| [Linear Regression](#linear-regression) | ML | Predict continuous targets using a linear approach ([Code](my_models.py)) |
+| [Logistic Regression](#logistic-regression) | ML | Binary/multi-class classification ([Code](my_models.py)) |
+| [TF-IDF (Term Frequency – Inverse Document Frequency)](#tf-idf) | NLP | Text vectorization for ML models ([Code](tfidf.py)) |
+| [Decision Tree Models](#decision-tree-models) | ML/DL | Tree-based models for regression and classification ([Code](decision_tree_algorithm.py)) |
+| [K-Means Clustering](#k-means-clustering) | ML | Unsupervised clustering algorithm ([Code](k_means.py)) |
 | [Softmax Classifier](#softmax-classifier) | DL | Multi-class classification ([Code](softmax_regressor.py)) |
 | [Feedforward Neural Network](#feedforward-neural-network) | DL | Fully connected neural network ([Code](neural_network.py)) |
 
- # 📘 Linear Regression (From Scratch)
+
+ # Linear Regression 
 
 This section documents the **Linear Regression** model implemented from scratch in Python.  
 
@@ -127,7 +132,7 @@ class linear(model):
 ```
 
 
-# 📘 Logistic Regression (From Scratch)
+# Logistic Regression 
 
 This section documents the **Logistic Regression** model implemented from scratch in Python.
 
@@ -232,7 +237,7 @@ class logistic(model):
         else:
             return np.argmax(probs, axis=1)
 ```
-# 📘 TF-IDF (Term Frequency – Inverse Document Frequency)
+# TF-IDF (Term Frequency – Inverse Document Frequency)
 
 This section documents the **TF-IDF** model implemented from scratch in Python for converting text into numerical features suitable for machine learning.
 
@@ -339,7 +344,7 @@ class TFIDF:
             tfidf.append(a)
         return np.array(tfidf, dtype=float)
 ```
-# 📘 Decision Tree Models
+#  Decision Tree Models
 
 This section documents **Decision Trees** implemented from scratch in Python for both **classification** and **regression** tasks.
 
@@ -479,7 +484,7 @@ def fit_regression(X, y, max_depth=float('inf'), min_samples=2):
 
     return root
 ```
-# 📘 K-Means Clustering (From Scratch)
+# K-Means Clustering 
 
 This section documents the **K-Means clustering algorithm** implemented from scratch in Python for **unsupervised learning** tasks.
 
@@ -556,7 +561,7 @@ def k_means(x, k, max_iters=10):
 
     return labels, centroids
 ```
-# 📘 Softmax Classifier (From Scratch)
+# Softmax Classifier 
 
 This section documents the **Softmax classifier** implemented from scratch in Python for **multi-class classification** tasks.
 
@@ -639,7 +644,7 @@ def fit_softmax(x, y, learning_rate=0.01, epochs=1000):
 
     return w, b
 ```
-# 📘 Feedforward Neural Network (From Scratch)
+# Feedforward Neural Network 
 
 This section documents a **fully-connected feedforward neural network** implemented from scratch in Python for **supervised learning** tasks.
 
@@ -792,6 +797,7 @@ def neural_network(x, y, learning_rate=0.01, n_layer=2, n_neurons=[5,5], epochs=
 
     return wights, biases, w_out, b_out
 ```
+
 
 
 
