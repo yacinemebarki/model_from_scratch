@@ -35,13 +35,13 @@ The goal is to build a strong foundation, document each step, and provide reprod
 
 | Model / Project | Type | Description |
 |-----------------|------|-------------|
-| [Linear Regression](#linear-regression) | ML | Predict continuous targets using a linear approach ([Code](my_models.py)) |
-| [Logistic Regression](#logistic-regression) | ML | Binary/multi-class classification ([Code](my_models.py)) |
-| [TF-IDF (Term Frequency – Inverse Document Frequency)](#tf-idf) | NLP | Text vectorization for ML models ([Code](tfidf.py)) |
-| [Decision Tree Models](#decision-tree-models) | ML/DL | Tree-based models for regression and classification ([Code](decision_tree_algorithm.py)) |
-| [K-Means Clustering](#k-means-clustering) | ML | Unsupervised clustering algorithm ([Code](k_means.py)) |
-| [Softmax Classifier](#softmax-classifier) | DL | Multi-class classification ([Code](softmax_regressor.py)) |
-| [Feedforward Neural Network](#feedforward-neural-network) | DL | Fully connected neural network ([Code](neural_network.py)) |
+| [Linear Regression](#linear-regression) | ML | Predict continuous targets using a linear approach ([Code](https://github.com/yacinemebarki/model_from_scratch/blob/main/my_models.py)) |
+| [Logistic Regression](#logistic-regression) | ML | Binary/multi-class classification ([Code](https://github.com/yacinemebarki/model_from_scratch/blob/main/my_models.py)) |
+| [TF-IDF (Term Frequency – Inverse Document Frequency)](#TF-IDF) | NLP | Text vectorization for ML models ([Code](https://github.com/yacinemebarki/model_from_scratch/blob/main/TFIDf.py)) |
+| [Decision Tree Models](#decision-tree-models) | ML/DL | Tree-based models for regression and classification ([Code](https://github.com/yacinemebarki/model_from_scratch/blob/main/decision_tree_algorithm.py)) |
+| [K-Means Clustering](#k-means-clustering) | ML | Unsupervised clustering algorithm ([Code](https://github.com/yacinemebarki/model_from_scratch/blob/main/k_means.py)) |
+| [Softmax Classifier](#softmax-classifier) | DL | Multi-class classification ([Code](https://github.com/yacinemebarki/model_from_scratch/blob/main/softmax_regressor.py)) |
+| [Feedforward Neural Network](#feedforward-neural-network) | DL | Fully connected neural network ([Code](https://github.com/yacinemebarki/model_from_scratch/blob/main/neurel_network.py)) |
 
 
  # Linear Regression 
@@ -237,7 +237,7 @@ class logistic(model):
         else:
             return np.argmax(probs, axis=1)
 ```
-# TF-IDF (Term Frequency – Inverse Document Frequency)
+# TF-IDF 
 
 This section documents the **TF-IDF** model implemented from scratch in Python for converting text into numerical features suitable for machine learning.
 
@@ -797,6 +797,7 @@ def neural_network(x, y, learning_rate=0.01, n_layer=2, n_neurons=[5,5], epochs=
 
     return wights, biases, w_out, b_out
 ```
+
 
 
 
