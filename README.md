@@ -797,6 +797,123 @@ def neural_network(x, y, learning_rate=0.01, n_layer=2, n_neurons=[5,5], epochs=
 
     return wights, biases, w_out, b_out
 ```
+## 🔹 Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yacinemebarki/model_from_scratch
+cd ml-dl-models
+```
+2. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+## 🔹 Usage
+```python
+from rnn.tok import tokenizer, embedding
+from rnn.recunn import recurent
+from rnn.rnn import layer
+text_array=[
+    "I love AI",
+    "Deep learning is fun",
+    "Hello world",
+    "Python is great",
+    "RNN is powerful",
+    "I love deep learning"
+]
+
+
+labels=[1, 1, 0, 1, 0, 1]
+#tokenization
+tok=tokenizer()
+tok.fit(text_array)
+vec=tok.encode(text_array)
+vec_padded = tok.padding(vec, 5)
+
+
+print("tokenization",vec)
+#creating rnn model
+model=layer()
+model.addembedding(tok.wordid,5)
+model.addrecun(6)
+#train
+model.fit(vec_padded,labels)
+print("wight",model.w_out)
+print("bias",model.b_out)
+text_pre=[
+    "i love python",
+    "i love machine learning"
+]
+vec_pre=tok.encode(text_pre)
+vec_pre=tok.padding(vec_pre,5)
+#predict
+result=model.predict(vec_pre)
+print(result)
+```
+## 🔹 Repository Structure
+model_from_scratch/
+│
+├─ cnn/
+│   ├─ convnn.py
+│   ├─ conv.py
+│   ├─ flatt.py
+│   └─ maxpool.py
+│
+├─ rnn/
+│   ├─ tok.py
+│   ├─ recunn.py
+│   └─ rnn.py
+│
+├─ my_models.py
+├─ my_models.py
+├─ decision_tree_alogrithm.py
+├─ k_means.py
+├─ TFIDF.py
+├─ neural_network.py
+├─ softmax_regressor.py
+├─ README.md
+└─ requirements.txt
+## 🔹 Contributing
+
+Contributions are welcome! This project aims to be a learning and reference repository for implementing ML and DL models from scratch. You can contribute by:
+
+- Reporting issues or bugs
+- Suggesting improvements or optimizations
+- Adding new models or architectures
+- Improving documentation, explanations, and examples
+
+### How to Contribute:
+1. Fork the repository.
+2. Create a new branch for your feature or fix:  
+   `git checkout -b feature/your-feature-name`
+3. Make your changes and commit them:  
+   `git commit -m "Add feature: description"`
+4. Push to your fork:  
+   `git push origin feature/your-feature-name`
+5. Open a Pull Request explaining your changes.
+
+Please ensure your code is well-commented and follows the existing project structure.
+
+---
+
+## 🔹 License
+
+This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
+
+You are free to use, modify, and distribute this code for personal, educational, or commercial purposes, as long as proper attribution is given.
+
+
+
+
+
+
 
 
 
