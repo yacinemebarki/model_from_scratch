@@ -106,7 +106,7 @@ Where $\eta$ is the learning rate, and $\odot$ denotes element-wise multiplicati
 🔹 **Key Code Snippet**
 
 
-- Implementation: [`tok.py`](https://github.com/yacinemebarki/model_from_scratch/blob/main/rnn/recunn.py)  
+- Implementation: [`recunn.py`](https://github.com/yacinemebarki/model_from_scratch/blob/main/rnn/recunn.py)  
 - Classes: `recurent`
 - Methods: `fit`, `backdrop`
 
@@ -171,7 +171,7 @@ $$
 $$
 \mathbf{y}_{\text{pred}} = \tanh(\mathbf{z})
 $$ 
-- Implementation: [`tok.py`](https://github.com/yacinemebarki/model_from_scratch/blob/main/rnn/rnn.py)  
+- Implementation: [`rnn.py`](https://github.com/yacinemebarki/model_from_scratch/blob/main/rnn/rnn.py)  
 - Classes: `layer`
 - Methods: `addrecun`, `addembedding`,`fit`,`predict`
 
