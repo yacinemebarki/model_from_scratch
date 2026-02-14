@@ -8,9 +8,7 @@ Extract spatial features from images or feature maps using learnable kernels and
 🔹 **Mathematical Foundation**  
 For an input patch $X$ and kernel $K$ with bias $b$, the convolution operation is:
 
-$$
-Z[i,j] = \sum_{c=1}^{C} \sum_{u=1}^{k_h} \sum_{v=1}^{k_w} X[i \cdot s + u, j \cdot s + v, c] \cdot K[u,v,c] + b
-$$
+$Z[i,j] = \sum_{c=1}^{C} \sum_{u=1}^{k_h} \sum_{v=1}^{k_w} X[i \cdot s + u, j \cdot s + v, c] \cdot K[u,v,c] + b$
 
 where:  
 - $k_h, k_w$ = kernel height and width  
@@ -19,23 +17,15 @@ where:
 
 The activation function applied after convolution is **ReLU**:
 
-$$
-A[i,j] = \text{ReLU}(Z[i,j]) = \max(0, Z[i,j])
-$$
+$A[i,j] = \text{ReLU}(Z[i,j]) = \max(0, Z[i,j])$
 
 During backpropagation, gradients are computed as:
 
-$$
-\frac{\partial \mathcal{L}}{\partial K} = \sum_{i,j} \text{dout}[i,j] \cdot X_{\text{patch}}
-$$
+$\frac{\partial \mathcal{L}}{\partial K} = \sum_{i,j} \text{dout}[i,j] \cdot X_{\text{patch}}$
 
-$$
-\frac{\partial \mathcal{L}}{\partial b} = \sum_{i,j} \text{dout}[i,j]
-$$
+$\frac{\partial \mathcal{L}}{\partial b} = \sum_{i,j} \text{dout}[i,j]$
 
-$$
-\frac{\partial \mathcal{L}}{\partial X} = \sum_{k} K_k * \text{dout}_k
-$$
+$$\frac{\partial \mathcal{L}}{\partial X} = \sum_{k} K_k * \text{dout}_k$$
 
 🔹 **Files**  
 - Implementation: [`conv_layer.py`](https://github.com/yacinemebarki/model_from_scratch/blob/main/cnn/conv.py)  
