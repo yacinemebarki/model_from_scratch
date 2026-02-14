@@ -1,5 +1,5 @@
-from tok import tokenizer,embedding
-from recunn import recurent
+from .tok import tokenizer,embedding
+from .recunn import recurent
 import numpy as np
 
 class layer:
