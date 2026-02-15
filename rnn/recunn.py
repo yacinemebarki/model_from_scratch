@@ -31,7 +31,7 @@ class recurent:
         if t>0:
             dw_h=self.hidden[t-1][:,None] @ dtan[None,:]
         dbh=dtan
-        max_norm = 5.0
+        max_norm = self.H_size
 
 
         dw_x = np.clip(dw_x, -max_norm, max_norm)

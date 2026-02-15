@@ -1,11 +1,11 @@
-from flatt import flatt
-from conv import conv
-from maxpool import maxpool
+from .flatt import flatt
+from .conv import conv
+from .maxpool import maxpool
 import numpy as np
 def softmax(z):
     exp_z = np.exp(z - np.max(z))
     return exp_z / np.sum(exp_z)
-class layer :
+class layerc :
     def __init__(self):
         self.layers=[]
         self.wout=None
@@ -83,73 +83,7 @@ class layer :
             aout=softmax(z)    
             output.append(aout) 
         return output                             
-#test cnn
-x=np.array([
-    [[1, 2, 1, 0],
-     [0, 1, 0, 2],
-     [2, 1, 0, 1],
-     [1, 0, 2, 1]],
 
-    [[2, 0, 1, 1],
-     [1, 1, 0, 2],
-     [0, 2, 1, 0],
-     [1, 1, 2, 1]]
-])
-
-
-y=np.array([0, 1])  
-
-
-
-model=layer()
-
-
-model.addconv(n_kernel=1, kernel_size=(3,3), input_shape=(4,4,1), stride=1)
-model.addmaxpool(pool_size=(2,2), stirde=2)
-model.addflatt()
-
-model.fit(x, y, learning_rate=0.01, epoches=5)
-
-print("Training done!")
-print("Output weights:", model.wout)
-print("Output bias:", model.bout)
-x2=[[[1, 3, 1, 2],
-     [0, 1, 0, 0],
-     [2, 1, 0, 1],
-     [2, 0, 1, 0]]]
-y2=model.predict(x2)
-print("prediction:",y)
-
-
-#testing using tensorflow dataset
-from tensorflow.keras.datasets import mnist
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-
-print(x_train.shape)
-print(y_train.shape)
-print(np.unique(y_train))
-x_test=x_test[:100]
-print(len(np.unique(x_test)))
-x_train = x_train.reshape(-1,28, 28, 1)  
-x_test  = x_test.reshape(-1,28, 28, 1) 
-
-x_train = x_train.astype(np.float32) / 255.0
-x_test  = x_test.astype(np.float32) / 255.0
-x_train=x_train[:100]
-y_train=y_train[:100]
-model2=layer()
-model2.addconv(n_kernel=1, kernel_size=(3,3), input_shape=(28,28,1), stride=1)
-model2.addmaxpool(pool_size=(2,2), stirde=2)
-model2.addflatt()
-model2.fit(x_train,y_train,learning_rate=0.01,epoches=10)
-print("keras weight",model2.wout)
-print("keras bias",model2.bout)
-x_test=x_test[:100]
-
-
-y_test=model2.predict(x_test)
-preds = [np.argmax(p) for p in y_test]
-print(preds)
 
 
     
