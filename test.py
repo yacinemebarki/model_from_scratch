@@ -143,7 +143,45 @@ print("K-means model labels:\n",labels)
 print("K-means model centroids:\n",centroids)
 y_km_pred=kmeans_model.predict(X_km)
 print("K-means model predictions:\n",y_km_pred)
+from rnn.tok import tokenizer, embedding
+from rnn.recunn import recurent
+from rnn.rnn import layer
+text_array=[
+    "I love AI",
+    "Deep learning is fun",
+    "Hello world",
+    "Python is great",
+    "RNN is powerful",
+    "I love deep learning"
+]
 
+
+labels=[1, 1, 0, 1, 0, 1]
+#tokenization
+tok=tokenizer()
+tok.fit(text_array)
+vec=tok.encode(text_array)
+vec_padded = tok.padding(vec, 5)
+
+
+print("tokenization",vec)
+#creating rnn model
+model=layer()
+model.addembedding(tok.wordid,5)
+model.addrecun(6)
+#train
+model.fit(vec_padded,labels)
+print("wight",model.w_out)
+print("bias",model.b_out)
+text_pre=[
+    "i love python",
+    "i love machine learning"
+]
+vec_pre=tok.encode(text_pre)
+vec_pre=tok.padding(vec_pre,5)
+#predict
+result=model.predict(vec_pre)
+print(result)
 
 
 
