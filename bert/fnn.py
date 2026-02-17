@@ -6,6 +6,10 @@ def relu(x):
 def relu_derivative(x):
     return np.where(x > 0, 1, 0)
 
+def softmax(z):
+    exp_z = np.exp(z - np.max(z))
+    return exp_z / np.sum(exp_z)
+
 class fnn:
     def __init__(self,input_size):
         self.input_size=input_size
@@ -26,8 +30,8 @@ class fnn:
             
             y=self.w @ x[t]+self.b
             y=relu(y)
-            y2=self.w_out*y+self.b_out
-            output.append(y2)
+            y2=y@self.w_out+self.b_out
+            output.append(softmax(y2))
         return np.array(output)    
         
                 
