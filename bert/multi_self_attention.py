@@ -7,7 +7,7 @@ def softmax(z):
 
 
 class msa:
-    def __init__(self,input_size,num_heads):
+    def __init__(self,input_size,num_heads,vocab):
         self.w=None
         self.q=None
         self.v=None
@@ -15,10 +15,10 @@ class msa:
         self.kw=np.random.rand(input_size,dk)*0.01
         self.vw=np.random.rand(input_size,dk)*0.01
         self.qw=np.random.rand(input_size,dk)*0.01
-    def forward(self,x,mask_vec):
+    def forward(self,x,mask_vec,vocab):
         x=np.array(x)
         
-        masked,target=mask(x,mask_vec)
+        masked,target=mask(x,vocab,mask_vec)
         
         
         dk=self.kw.shape[1]
@@ -36,7 +36,7 @@ class msa:
                 v=masked[j]@self.vw
                 z=z+weights[j]*v
             out.append(z)
-        return np.array(out)                        
+        return np.array(out),target                        
                 
             
             
