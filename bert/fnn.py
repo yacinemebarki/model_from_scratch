@@ -31,7 +31,7 @@ class fnn:
         for t in range(n_sample):
             
             y=self.w @ x[t]+self.b
-            gradvec.append()
+            gradvec.append(y)
             y=relu(y)
             y2=y@self.w_out+self.b_out
             output.append(softmax(y2))
@@ -39,10 +39,10 @@ class fnn:
             
         return np.array(output),np.array(vec),np.array(gradvec)   
     def backdrop(self,x,z,a,y,lr):
-        dw2=a.T*z
-        da=z@self.w_out.T
+        dw2=np.outer(a,z)
+        da=self.w_out.T@z
         db=da*relu_derivative(y)
-        dw=x.T*db
+        dw=np.outer(x,db)
         self.w-=lr*dw
         self.w_out-=lr*dw2
         self.b_out-=lr*z
