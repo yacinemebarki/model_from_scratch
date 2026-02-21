@@ -21,28 +21,31 @@ class fnn:
         self.b_out=np.zeros(self.input_size)
         
 
-    def forward(self,x,vocab,learning_rate=0.01):
-        x=np.array(x)    
+    def forward(self,x):
+        x=np.array(x)  
+        self.x=x  
         n_sample=x.shape[0]
         output=[]
         vec=[]
-        gradvec=[]
+        self.gradvec=[]
         
         for t in range(n_sample):
             
             y=self.w @ x[t]+self.b
-            gradvec.append(y)
+            self.gradvec.append(y)
             y=relu(y)
             y2=y@self.w_out+self.b_out
-            output.append(softmax(y2))
+            output.append(y2)
             vec.append(y)
+        self.output=output
+        self.vec=vec    
             
-        return np.array(output),np.array(vec),np.array(gradvec)   
-    def backdrop(self,x,z,a,y,lr):
-        dw2=np.outer(a,z)
+        return np.array(output)   
+    def backdrop(self,z,lr,i):
+        dw2=np.outer(self.vec[i],z)
         da=self.w_out.T@z
-        db=da*relu_derivative(y)
-        dw=np.outer(x,db)
+        db=da*relu_derivative(self.output[i])
+        dw=np.outer(self.x,db)
         self.w-=lr*dw
         self.w_out-=lr*dw2
         self.b_out-=lr*z

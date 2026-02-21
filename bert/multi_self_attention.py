@@ -7,7 +7,7 @@ def softmax(z):
 
 
 class msa:
-    def __init__(self,input_size,num_heads,vocab):
+    def __init__(self,input_size,num_heads):
         self.w=None
         self.q=None
         self.v=None
@@ -19,6 +19,7 @@ class msa:
         self.qw=np.random.rand(input_size,dk)*0.01
     def forward(self,x,mask_vec,vocab):
         x=np.array(x)
+        self.x=x
         
         masked,target=mask(x,vocab,mask_vec)
         
@@ -59,9 +60,14 @@ class msa:
             out.append(z)
             arrayv.append(vec)
             weight.append(weights)
+            self.outq=outq
+            self.weight=weight
+            self.arrayv=arrayv
+            self.arrayk=arrayk
             
-        return np.array(out),target,weight,arrayv
-    def backdrop(self,x,weights,z,arrayv,arrayk,q,lr):
+            
+        return np.array(out),target
+    def backdrop(self,z,lr,j):
         dwv=np.zeros((self.input_size,self.dk))
         dwq=np.zeros((self.input_size,self.dk))
         dwk=np.zeros((self.input_size,self.dk))
@@ -70,20 +76,20 @@ class msa:
         dq=np.zeros(self.dk)
         dv=np.zeros((self.input_size,self.dk))
         
-        da=np.zeros(len(weights))
+        da=np.zeros(len(self.weight[j]))
         
         
         
-        for i in range(len(weights)):
-            dv=weights[i]*z
-            dwv+=np.outer(x[i],dv)
-            da[i]=z@arrayv[i]
-        ds = weights*(da - np.sum(da * weights))
+        for i in range(len(self.weight[j])):
+            dv=self.weight[j][i]*z
+            dwv+=np.outer(self.x[i],dv)
+            da[i]=z@self.arrayv[j][i]
+        ds = self.weight[j]*(da - np.sum(da * self.weight[j]))
         for i in range(len(ds)):
-            dq+=ds[i]*arrayk[i]/np.sqrt(self.dk) 
-            dk_j = ds[i] * q / np.sqrt(self.dk)
-            dwk += np.outer(x[i], dk_j)
-            dwq +=np.outer(x, dq)
+            dq+=ds[i]*self.arrayk[j][i]/np.sqrt(self.dk) 
+            dk_j = ds[i] * self.outq[j] / np.sqrt(self.dk)
+            dwk += np.outer(self.x[i], dk_j)
+            dwq +=np.outer(self.x, dq)
             
         self.qw -= lr * dwq
         self.kw -= lr * dwk
