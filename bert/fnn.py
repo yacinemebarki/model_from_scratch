@@ -24,28 +24,25 @@ class fnn:
     def forward(self,x):
         x=np.array(x)  
         self.x=x  
-        n_sample=x.shape[0]
-        output=[]
-        vec=[]
-        self.gradvec=[]
         
-        for t in range(n_sample):
+        
+        
+        
             
-            y=self.w @ x[t]+self.b
-            self.gradvec.append(y)
-            y=relu(y)
-            y2=y@self.w_out+self.b_out
-            output.append(y2)
-            vec.append(y)
-        self.output=output
-        self.vec=vec    
+        y= x@self.w +self.b
+        
+        y=relu(y)
+        out=y@self.w_out+self.b_out
+        
+        self.y=y
+        self.out=out
             
-        return np.array(output)   
-    def backdrop(self,z,lr,i):
-        dw2=np.outer(self.vec[i],z)
+        return np.array(out)   
+    def backdrop(self,z,lr):
+        dw2=self.y.T@z
         da=self.w_out.T@z
-        db=da*relu_derivative(self.output[i])
-        dw=np.outer(self.x,db)
+        db=da*relu_derivative(self.y)
+        dw=self.x.T@db
         self.w-=lr*dw
         self.w_out-=lr*dw2
         self.b_out-=lr*z
