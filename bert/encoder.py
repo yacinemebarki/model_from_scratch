@@ -7,7 +7,7 @@ class enco:
         self.flayer=fnn(input_size)
         self.mlayer=msa(input_size,num_heads)
 
-    def forward(self,x,mask_vec,lr):
+    def forward(self,x,mask_vec):
         out,target=self.mlayer.forward(x,mask_vec)
         out=self.flayer.forward(out)
         return out,target

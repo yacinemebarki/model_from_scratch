@@ -39,6 +39,7 @@ class fnn:
             
         return np.array(out)   
     def backdrop(self,z,lr):
+        
         dw2=self.y.T@z
         da=self.w_out.T@z
         db=da*relu_derivative(self.y)

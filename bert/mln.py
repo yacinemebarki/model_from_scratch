@@ -5,12 +5,12 @@ def mask(x,vocab,mask_vec):
     n_token=len(x)
     maskidx=np.random.choice(n_token,size=int(0.15*n_token),replace=False)
     masked=x.copy()
-    target=[]
+    target=np.full_like(x, -1)
     
     
     for i in maskidx:
         prob=np.random.rand()
-        target.append(i)
+        target[i]=x[i]
         if prob<0.8:
             masked[i]=mask_vec
         elif prob<0.9:
