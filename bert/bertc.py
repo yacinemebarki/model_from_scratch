@@ -11,14 +11,16 @@ def softmax(z):
 
 
 class bert:
-    def __init__(self,n_encoder,input_size,num_heads,n_token,mask_vec):
+    def __init__(self,n_encoder,input_size,num_heads,n_token,mask_vec,vocab,wordid):
         self.input_size=input_size
         self.n_encoder=n_encoder
         self.layers=[]
         self.n_token=n_token
+        self.wordid=wordid
         self.w_vocab=np.random.randn(input_size, n_token) * 0.01
         self.b_vocab=np.zeros(n_token)
         self.mask_vec=mask_vec
+        self.vocab=vocab
     
         for i in range(n_encoder):
             l=enco(input_size,num_heads)
@@ -31,14 +33,17 @@ class bert:
         for i in range(n_samples):
             a=x[i]
             for l in self.layers:
-                a,target=l.forward()
+                print("enter",i)
+                a,target=l.forward(a,mask_vec,self.vocab,self.wordid)
             
             out=a@self.w_vocab+self.b_vocab
             out=softmax(out)
             
             z=np.zeros_like(out)
+            
             for j,id in enumerate(target):
-                if id!=-1:
+                
+                if (id!=0).any():
                     one_hot=np.zeros(self.n_token)
                     one_hot[id]=1
                     z[j]=out[j]-one_hot
@@ -104,23 +109,13 @@ emb_vec=[]
 for text in vec:
     a=emb.forward(text)
     emb_vec.append(a)
-print(emb_vec)    
-    
-    
-    
+print(emb_vec)
+
+print(len(emb_vec[0]))
+mask_vec=np.random.rand(7)*0.1
+
+ber=bert(2,7,3,len(tok.wordid),mask_vec,emb.vecword,tok.wordid)
 
 
-
-
-            
-                
-            
-            
-                                
-                
-            
-            
-            
-        
-        
-    
+w,b=ber.fit(emb_vec,0.01)   
+print(w,b)

@@ -2,8 +2,8 @@ import numpy as np
 from mln import mask
 
 def softmax(z):
-    exp_z = np.exp(z - np.max(z),axis=1,keepdims=True)
-    return exp_z / np.sum(exp_z,axis=1,keepdims=True)
+    exp_z = np.exp(z - np.max(z))
+    return exp_z / np.sum(exp_z)
 
 
 class msa:
@@ -14,16 +14,17 @@ class msa:
         dk=input_size//num_heads
         self.dk=dk
         self.input_size=input_size
-        self.kw=np.random.rand(input_size,dk)*0.01
-        self.vw=np.random.rand(input_size,dk)*0.01
-        self.qw=np.random.rand(input_size,dk)*0.01
+        self.kw=np.random.rand(input_size,input_size)*0.01
+        self.vw=np.random.rand(input_size,input_size)*0.01
+        self.qw=np.random.rand(input_size,input_size
+                               )*0.01
     
-    def forward(self,x,mask_vec):
+    def forward(self,x,mask_vec,vocab,wordid):
         x=np.array(x)
         
         dk=self.dk
         
-        masked,target=mask(x,mask_vec)
+        masked,target=mask(x,mask_vec,vocab,wordid)
         self.x=masked
         
         q=masked@self.qw
