@@ -67,7 +67,10 @@ class embedding:
             if word==0:
                 vec.append(np.zeros(len(next(iter(self.vecword.values())))))
             else :
-                vec.append(self.vecword[word])
+                if word in self.vecword:
+                    vec.append(self.vecword[word])
+                else :
+                    vec.append(np.random.rand(self.out_dim)*0.1)    
             
         return np.array(vec)            
                     

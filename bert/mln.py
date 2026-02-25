@@ -1,24 +1,26 @@
 import numpy as np
 
-def mask(x,mask_vec,vocab,wordid):
+def mask(x,vocab):
     x=np.array(x)
 
     n_token=len(x)
     maskidx=np.random.choice(n_token,size=int(0.15*n_token),replace=False)
     masked=x.copy()
-    target=np.zeros((len(x), len(x[0])),dtype=float)
+    print(x)
+    target=np.full(len(x), -1)
+    
     
     
     for i in maskidx:
         prob=np.random.rand()
+        
         target[i]=x[i]
         if prob<0.8:
-            print("data",x)
-            print("bug1",len(masked[i]))
-            masked[i]=mask_vec
+            
+            masked[i]=-1
         elif prob<0.9:
             pass
         else:
-            masked[i]=np.random.choice(vocab)    
+            masked[i]=np.random.choice(list(vocab.values()))   
     return masked,target
         

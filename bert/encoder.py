@@ -7,10 +7,10 @@ class enco:
         self.flayer=fnn(input_size)
         self.mlayer=msa(input_size,num_heads)
 
-    def forward(self,x,mask_vec,vocab,wordid):
-        out,target=self.mlayer.forward(x,mask_vec,vocab,wordid)
+    def forward(self,x):
+        out=self.mlayer.forward(x)
         out=self.flayer.forward(out)
-        return out,target
+        return out
     def backdrop(self,dout,lr):
         dx=self.flayer.backdrop(dout,lr)
         dx=self.mlayer.backdrop(dx,lr)

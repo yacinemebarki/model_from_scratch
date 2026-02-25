@@ -19,17 +19,17 @@ class msa:
         self.qw=np.random.rand(input_size,input_size
                                )*0.01
     
-    def forward(self,x,mask_vec,vocab,wordid):
+    def forward(self,x):
         x=np.array(x)
         
         dk=self.dk
         
-        masked,target=mask(x,mask_vec,vocab,wordid)
-        self.x=masked
         
-        q=masked@self.qw
-        k=masked@self.kw
-        v=masked@self.vw
+        self.x=x
+        
+        q=x@self.qw
+        k=x@self.kw
+        v=x@self.vw
         
         score=(q@k.T)/np.sqrt(dk)
         
@@ -41,7 +41,7 @@ class msa:
         
         self.weight=weight
         out=weight@v
-        return out,target
+        return out
     
     def backdrop(self,dout,lr):
         dv=self.weight.T@dout

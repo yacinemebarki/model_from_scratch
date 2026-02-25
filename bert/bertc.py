@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from encoder import enco
 from rnn.tok import tokenizer,embedding
+from mln import mask
 
 def softmax(z):
     exp_z = np.exp(z - np.max(z))
@@ -11,16 +12,16 @@ def softmax(z):
 
 
 class bert:
-    def __init__(self,n_encoder,input_size,num_heads,n_token,mask_vec,vocab,wordid):
+    def __init__(self,n_encoder,input_size,num_heads,n_token,emb):
         self.input_size=input_size
         self.n_encoder=n_encoder
         self.layers=[]
         self.n_token=n_token
-        self.wordid=wordid
-        self.w_vocab=np.random.randn(input_size, n_token) * 0.01
+        self.wordid=emb.wordid
+        self.w_vocab=np.random.randn(input_size,n_token) * 0.01
         self.b_vocab=np.zeros(n_token)
-        self.mask_vec=mask_vec
-        self.vocab=vocab
+        
+        self.vocab=emb.vecword
     
         for i in range(n_encoder):
             l=enco(input_size,num_heads)
@@ -31,10 +32,12 @@ class bert:
         x=np.array(x)
         n_samples=len(x)
         for i in range(n_samples):
-            a=x[i]
+            tokens=x[i]
+            masked_tokens, target=mask(tokens,self.wordid)
+            a = emb.forward(masked_tokens)
             for l in self.layers:
                 print("enter",i)
-                a,target=l.forward(a,mask_vec,self.vocab,self.wordid)
+                a=l.forward(a)
             
             out=a@self.w_vocab+self.b_vocab
             out=softmax(out)
@@ -42,9 +45,9 @@ class bert:
             z=np.zeros_like(out)
             
             for j,id in enumerate(target):
-                
-                if (id!=0).any():
-                    one_hot=np.zeros(self.n_token)
+                print("the id ",id)
+                if (id!=-1).any():
+                    one_hot= np.zeros(self.n_token)
                     one_hot[id]=1
                     z[j]=out[j]-one_hot
             
@@ -56,7 +59,24 @@ class bert:
             
             for l in reversed(self.layers):
                 dout=l.backdrop(dout,lr)
-        return self.w_vocab,self.b_vocab
+        
+    def predict(self,x):
+        x=np.array(x)
+        n_samples=x.shape[0]
+        out=[]
+        for i in range(n_samples):
+            a=x[i]
+            for l in self.layers:
+                a=l.forward(a)
+            out=a@self.w_vocab+self.b_vocab
+            out=softmax(out)
+            
+            pred_tokens=np.argmax(out, axis=1)
+            out.append(pred_tokens)
+        return out    
+                
+                
+            
 
 
 
@@ -104,18 +124,30 @@ vec=tok.encode(text_array)
 vec=tok.padding(vec,7)
 emb=embedding(tok.wordid,7)
 emb.embedding_tran()
-emb_vec=[]
 
-for text in vec:
-    a=emb.forward(text)
-    emb_vec.append(a)
-print(emb_vec)
-
-print(len(emb_vec[0]))
-mask_vec=np.random.rand(7)*0.1
-
-ber=bert(2,7,3,len(tok.wordid),mask_vec,emb.vecword,tok.wordid)
+print(vec[0])
 
 
-w,b=ber.fit(emb_vec,0.01)   
-print(w,b)
+ber=bert(2,7,3,len(tok.wordid),emb)
+
+
+ber.fit(vec,0.01)   
+
+predict_text = [
+    "I love [MASK]",                      # predict what comes after "I love"
+    "Deep learning is [MASK]",            # predict missing word
+    "Python is [MASK]",                    # predict "great" or similar
+    "I enjoy coding in [MASK]",           # predict "Python"
+    "Neural networks are [MASK]",         # predict "interesting" or similar
+    "I hate [MASK] in my code",           # predict "bugs"
+    "Machine learning is [MASK]",         # predict "amazing"
+    "Training models is [MASK]",          # predict "rewarding"
+    "Sometimes programming is [MASK]",    # predict "stressful"
+    "I love [MASK] problems"              # predict "solving"
+]
+encoded_texts = [tok.encode([t])[0] for t in predict_text]  
+
+predictions = ber.predict(encoded_texts)
+
+
+

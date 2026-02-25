@@ -41,13 +41,15 @@ class fnn:
     def backdrop(self,z,lr):
         
         dw2=self.y.T@z
-        da=self.w_out.T@z
+        da=z@self.w_out.T
         db=da*relu_derivative(self.y)
         dw=self.x.T@db
         self.w-=lr*dw
         self.w_out-=lr*dw2
-        self.b_out-=lr*z
-        self.b-=lr*db
+        self.b_out-=lr* z.sum(axis=0)
+        self.b-=lr* db.sum(axis=0)
+        dx=db@self.w.T
+        return dx
         
                 
                 
