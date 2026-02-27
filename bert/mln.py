@@ -4,7 +4,7 @@ def mask(x,vocab):
     x=np.array(x)
 
     n_token=len(x)
-    maskidx=np.random.choice(n_token,size=int(0.15*n_token),replace=False)
+    maskidx=np.random.choice(n_token,size=max(1,int(0.5*n_token)),replace=False)
     masked=x.copy()
     print(x)
     target=np.full(len(x), -1)
@@ -15,9 +15,10 @@ def mask(x,vocab):
         prob=np.random.rand()
         
         target[i]=x[i]
+        
         if prob<0.8:
             
-            masked[i]=-1
+            masked[i]=vocab["[MASK]"]
         elif prob<0.9:
             pass
         else:

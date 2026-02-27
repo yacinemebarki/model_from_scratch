@@ -2,8 +2,8 @@ import numpy as np
 from mln import mask
 
 def softmax(z):
-    exp_z = np.exp(z - np.max(z))
-    return exp_z / np.sum(exp_z)
+    exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
 
 
 class msa:
@@ -44,6 +44,7 @@ class msa:
         return out
     
     def backdrop(self,dout,lr):
+        
         dv=self.weight.T@dout
         
         dwv=self.x.T@dv
@@ -63,6 +64,7 @@ class msa:
         self.vw -= lr * dwv
 
         dx = dq @ self.qw.T + dk @ self.kw.T + dv @ self.vw.T
+        
 
         return dx
                

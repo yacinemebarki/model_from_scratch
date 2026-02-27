@@ -5,9 +5,12 @@ def normalization(text):
 
 class tokenizer:
     def __init__(self):
-        self.wordid={}
+        wordid={}
+        wordid["[PAD]"]=0
+        wordid["[MASK]"]=1
+        self.wordid=wordid
         self.vecword={}
-        self.idx=1
+        self.idx=2
     def fit(self,texts):
         for text in texts:
             text=normalization(text)
@@ -27,6 +30,7 @@ class tokenizer:
             for word in te:
                 if word in self.wordid:
                     a.append(self.wordid[word])
+                  
             result.append(a)    
             
         return result
