@@ -16,11 +16,12 @@ class bert:
         self.input_size=input_size
         self.n_encoder=n_encoder
         self.layers=[]
+        self.emb=emb
         self.n_token=n_token
         wordid={}
         
         self.wordid=emb.wordid
-        self.w_vocab=np.random.randn(input_size,n_token) * 0.01
+        self.w_vocab=np.random.randn(input_size,n_token) * 0.1
         self.b_vocab=np.zeros(n_token)
         
         self.vocab=emb.vecword
@@ -34,11 +35,17 @@ class bert:
         x=np.array(x)
         n_samples=len(x)
         for epoch in range(100):
+            total_loss = 0
+            count = 0
             
             for i in range(n_samples):
                 tokens=x[i]
                 masked_tokens, target=mask(tokens,self.wordid)
-                a = emb.forward(masked_tokens)
+                
+                
+                a = self.emb.forward(masked_tokens)
+                
+                
                 for l in self.layers:
                     
                     a=l.forward(a)
@@ -47,24 +54,32 @@ class bert:
                 out=softmax(out)
             
                 z=np.zeros_like(out)
+                epoch_loss = 0
             
                 for j,id in enumerate(target):
-                    print("the id ",id)
+                    
                     if (id!=-1):
                         one_hot= np.zeros(self.n_token)
-                        one_hot[id]=1
+                        one_hot[int(id)]=1
                         z[j]=out[j]-one_hot
-                print("the lost",z)        
-            
+                        # compute cross-entropy loss
+                        epoch_loss += -np.sum(one_hot * np.log(out[j] + 1e-10))
+                        count += 1
+                       
+                total_loss += epoch_loss
                 dw=a.T @ z
                 db=z.sum(axis=0)
                 dout=z@self.w_vocab.T
                 self.w_vocab-=lr*dw
                 self.b_vocab-=lr*db
-                print("dout",dout)
+                
             
                 for l in reversed(self.layers):
                     dout=l.backdrop(dout,lr)
+            
+            if epoch % 10 == 0:
+                avg_loss = total_loss / max(count, 1)
+                print(f"Epoch {epoch}, Loss: {avg_loss:.4f}")
         
     def predict(self,x):
         x=np.array(x)
@@ -72,11 +87,12 @@ class bert:
         out=[]
         for i in range(n_samples):
             a=x[i]
-            a = emb.forward(a)
+            a = self.emb.forward(a)
             for l in self.layers:
                 a=l.forward(a)
             prob=a@self.w_vocab+self.b_vocab
-            print("logits variance:", np.var(prob))
+            
+            
             prob=softmax(prob)
             
             
@@ -133,19 +149,12 @@ tok=tokenizer()
 tok.fit(text_array)
 train_data = text_array * 100  
 vec = tok.encode(train_data)
-vec = tok.padding(vec, 7)
-train_data = text_array * 100  
-vec = tok.encode(train_data)
-vec = tok.padding(vec, 7)
-vec=tok.encode(text_array)
-vec=tok.padding(vec,7)
-emb=embedding(tok.wordid,7)
+vec = tok.padding(vec, 6)
+emb=embedding(tok.wordid,6)
 emb.embedding_tran()
 
 print(vec[0])
-
-
-ber=bert(2,7,3,len(tok.wordid),emb)
+ber=bert(2,6,3,len(tok.wordid),emb)
 
 
 ber.fit(vec,0.01)   
@@ -163,7 +172,7 @@ predict_text = [
     "I love [MASK] problems"              # predict "solving"
 ]
 vec_pre=tok.encode(predict_text)
-vec_pre=tok.padding(vec_pre, 7)
+vec_pre=tok.padding(vec_pre, 6)
 
 pred=ber.predict(vec_pre)
 print(pred)

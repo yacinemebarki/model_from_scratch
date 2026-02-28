@@ -2,11 +2,14 @@ import numpy as np
 
 def mask(x,vocab):
     x=np.array(x)
+    validx=np.where(x != 0)[0]
+    if len(validx) == 0:
+        return x.copy(), np.full(len(x), -1)
 
     n_token=len(x)
-    maskidx=np.random.choice(n_token,size=max(1,int(0.5*n_token)),replace=False)
+    maskidx=np.random.choice(validx,size=max(1,int(0.3*len(validx))),replace=False)
     masked=x.copy()
-    print(x)
+    
     target=np.full(len(x), -1)
     
     

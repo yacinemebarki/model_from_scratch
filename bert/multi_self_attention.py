@@ -14,10 +14,9 @@ class msa:
         dk=input_size//num_heads
         self.dk=dk
         self.input_size=input_size
-        self.kw=np.random.rand(input_size,input_size)*0.01
-        self.vw=np.random.rand(input_size,input_size)*0.01
-        self.qw=np.random.rand(input_size,input_size
-                               )*0.01
+        self.kw=np.random.rand(input_size,input_size)*0.1
+        self.vw=np.random.rand(input_size,input_size)*0.1
+        self.qw=np.random.rand(input_size,input_size)*0.01
     
     def forward(self,x):
         x=np.array(x)
@@ -30,6 +29,7 @@ class msa:
         q=x@self.qw
         k=x@self.kw
         v=x@self.vw
+        
         
         score=(q@k.T)/np.sqrt(dk)
         
@@ -58,6 +58,14 @@ class msa:
         
         dwq=self.x.T@dq
         dwk=self.x.T@dk
+        
+        clip = 1.0
+        dwq = np.clip(dwq, -clip, clip)
+        dwk = np.clip(dwk, -clip, clip)
+        dwv = np.clip(dwv, -clip, clip)
+        dq  = np.clip(dq,  -clip, clip)
+        dk  = np.clip(dk,  -clip, clip)
+        dv  = np.clip(dv,  -clip, clip)
         
         self.qw -= lr * dwq
         self.kw -= lr * dwk

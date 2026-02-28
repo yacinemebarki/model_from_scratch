@@ -59,11 +59,13 @@ class embedding:
             self.vecword[self.wordid[word]]=np.random.rand(self.out_dim)*0.1
     def forward(self,vec_text):
         
-        vec_text=np.array(vec_text)  
+        vec_text=np.array(vec_text) 
+        
+        
 
     
         if vec_text.ndim > 1:
-            vec_text=vec_text[0]
+            vec_text = vec_text.flatten()
        
         
         vec=[]

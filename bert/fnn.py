@@ -7,17 +7,17 @@ def relu_derivative(x):
     return np.where(x > 0, 1, 0)
 
 def softmax(z):
-    exp_z = np.exp(z - np.max(z))
-    return exp_z / np.sum(exp_z)
+    exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
 
 class fnn:
     def __init__(self,input_size):
         self.input_size=input_size
         
-        self.w=np.random.rand(self.input_size, 4*self.input_size) * 0.01
+        self.w=np.random.rand(self.input_size, 4*self.input_size) * 0.1
         self.b=np.zeros(4*self.input_size)
 
-        self.w_out=np.random.rand(4*self.input_size, self.input_size) * 0.01
+        self.w_out=np.random.rand(4*self.input_size, self.input_size) * 0.1
         self.b_out=np.zeros(self.input_size)
         
 
@@ -44,6 +44,12 @@ class fnn:
         da=z@self.w_out.T
         db=da*relu_derivative(self.y)
         dw=self.x.T@db
+        
+        clip = 1.0
+        dw  = np.clip(dw,  -clip, clip)
+        dw2 = np.clip(dw2, -clip, clip)
+        db  = np.clip(db,  -clip, clip)
+        
         self.w-=lr*dw
         self.w_out-=lr*dw2
         self.b_out-=lr* z.sum(axis=0)
