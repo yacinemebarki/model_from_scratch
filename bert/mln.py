@@ -21,6 +21,7 @@ def mask(x,vocab):
         
         if prob<0.8:
             
+            
             masked[i]=vocab["[MASK]"]
         elif prob<0.9:
             pass

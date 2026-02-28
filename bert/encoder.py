@@ -19,9 +19,9 @@ class enco:
         return out
     def backdrop(self,dout,lr):
         dx=self.flayer.backdrop(dout,lr)
-        dx = dx + dout
-        dx=self.mlayer.backdrop(dx,lr)
-        dx = dx + dout
+        dx1 = dx + dout
+        dx=self.mlayer.backdrop(dx1,lr)
+        dx = dx + dx1
         return dx
     
             

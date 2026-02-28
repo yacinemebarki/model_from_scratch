@@ -1,7 +1,14 @@
 import numpy as np
 
 def normalization(text):
-    return text.lower().split()
+    words = text.split()
+    normalized = []
+    for w in words:
+        if w == "[MASK]":  
+            normalized.append(w)
+        else:
+            normalized.append(w.lower())
+    return normalized
 
 class tokenizer:
     def __init__(self):
@@ -64,8 +71,7 @@ class embedding:
         
 
     
-        if vec_text.ndim > 1:
-            vec_text = vec_text.flatten()
+        
        
         
         vec=[]
@@ -78,7 +84,12 @@ class embedding:
                 else :
                     vec.append(np.random.rand(self.out_dim)*0.1)    
             
-        return np.array(vec)            
+        return np.array(vec)
+    def backward(self, dout, vec_text, lr):
+        
+        for i, word in enumerate(vec_text):
+            if word != 0:  
+                self.vecword[word] -= lr * dout[i]            
                     
                 
  

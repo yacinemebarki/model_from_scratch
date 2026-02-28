@@ -14,8 +14,8 @@ class msa:
         dk=input_size//num_heads
         self.dk=dk
         self.input_size=input_size
-        self.kw=np.random.rand(input_size,input_size)*0.1
-        self.vw=np.random.rand(input_size,input_size)*0.1
+        self.kw=np.random.rand(input_size,input_size)*0.01
+        self.vw=np.random.rand(input_size,input_size)*0.01
         self.qw=np.random.rand(input_size,input_size)*0.01
     
     def forward(self,x):

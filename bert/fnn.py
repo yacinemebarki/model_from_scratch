@@ -14,10 +14,10 @@ class fnn:
     def __init__(self,input_size):
         self.input_size=input_size
         
-        self.w=np.random.rand(self.input_size, 4*self.input_size) * 0.1
+        self.w=np.random.rand(self.input_size, 4*self.input_size) * 0.01
         self.b=np.zeros(4*self.input_size)
 
-        self.w_out=np.random.rand(4*self.input_size, self.input_size) * 0.1
+        self.w_out=np.random.rand(4*self.input_size, self.input_size) * 0.01
         self.b_out=np.zeros(self.input_size)
         
 
