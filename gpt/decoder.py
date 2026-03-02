@@ -17,7 +17,13 @@ class deco:
         out1=self.norm1(out1+x)
         out2=self.flayer.forward(out1) 
         out2=self.norm2(out2+out1)
-        return out2   
+        return out2
+    def backdrop(self,dout,lr):
+        dout1=self.flayer.backdrop(dout,lr)   
+        dout1=dout1+dout
+        dout2=self.mlayer.backdrop(dout1,lr)
+        dout2=dout1+dout2
+        return dout1
         
 
 
