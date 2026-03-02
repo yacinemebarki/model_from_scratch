@@ -206,7 +206,7 @@ tok=tokenizer()
 tok.fit(text_array)
 train_data = text_array * 100  
 vec = tok.encode(train_data)
-vec = tok.padding(vec, 32)
+vec = tok.padding(vec, 12)
 emb=embedding(tok.wordid,32)
 emb.embedding_tran()
 

@@ -1,60 +1,51 @@
 import numpy as np
-from mln import mask
 
 def softmax(z):
     exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
-    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+    return exp_z / np.sum(exp_z, axis=1, keepdims=True) 
 
 
-class msa:
-    def __init__(self,input_size,num_heads):
-        self.w=None
+class mssa:
+    
+    
+    def __init__(self,input_size,dk,n_token):
         self.q=None
         self.v=None
-        dk=input_size//num_heads
-        self.dk=dk
+        self.k=None 
+        
         self.input_size=input_size
-        self.kw=np.random.rand(input_size,input_size)*0.01
+        self.dk=dk
+        self.n_token=n_token
+        self.weight=None
         self.vw=np.random.rand(input_size,input_size)*0.01
         self.qw=np.random.rand(input_size,input_size)*0.01
+        self.kw=np.random.rand(input_size,input_size)*0.01
     
     def forward(self,x):
-        x=np.array(x)
-        
-        dk=self.dk
-        
-        
         self.x=x
+        self.q=x@self.qw
+        self.k=x@self.kw
+        self.v=x@self.vw
         
-        print("x shape",x.shape)
-        print("weight shape",self.qw.shape)
+        score=self.q@self.k.T/np.sqrt(self.dk)
         
-        q=x@self.qw
-        k=x@self.kw
-        v=x@self.vw
+        self.mask=np.triu(np.ones_like(score), k=1).astype(bool)
+        score[self.mask]=-1e9
         
+        self.weight=softmax(score)
         
-        score=(q@k.T)/np.sqrt(dk)
+        out=self.weight*self.v
         
-        weight=softmax(score)
-        
-        self.q=q
-        self.v=v
-        self.k=k
-        
-        self.weight=weight
-        out=weight@v
         return out
-    
     def backdrop(self,dout,lr):
-        
         dv=self.weight.T@dout
-        
         dwv=self.x.T@dv
         
-        dweight=dout@self.v.T
         
+        dweight=dout@self.v.T
         dscore=self.weight*(dweight-np.sum(dweight*self.weight,axis=1,keepdims=True))
+        dscore[self.mask] = 0
+        
         
         dq=dscore@self.k/np.sqrt(self.dk)
         dk=dscore@self.q/np.sqrt(self.dk)
@@ -78,14 +69,8 @@ class msa:
         
 
         return dx
-               
-            
-            
-
-
-                                    
-                
-            
-            
         
             
+            
+            
+                    
