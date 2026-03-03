@@ -1,5 +1,5 @@
-from fnn import fnn
-from multi_self_attention import msa
+from .fnn import fnn
+from .multi_self_attention import msa
 import numpy as np
 
 class enco:

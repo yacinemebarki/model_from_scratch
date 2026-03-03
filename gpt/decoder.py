@@ -4,7 +4,7 @@ import os,sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),'..')))
 
 from bert.fnn import fnn
-from masked_self_attention import mssa
+from .masked_self_attention import mssa
 
 class deco:
     def __init__(self,input_size,dk,n_tokens):

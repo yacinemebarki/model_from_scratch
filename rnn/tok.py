@@ -76,7 +76,7 @@ class embedding:
         
         vec=[]
         for word in vec_text:
-            if word==0:
+            if (word==0).any():
                 vec.append(np.zeros(len(next(iter(self.vecword.values())))))
             else :
                 if word in self.vecword:

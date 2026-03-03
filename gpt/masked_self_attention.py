@@ -34,7 +34,7 @@ class mssa:
         
         self.weight=softmax(score)
         
-        out=self.weight*self.v
+        out=self.weight@self.v
         
         return out
     def backdrop(self,dout,lr):

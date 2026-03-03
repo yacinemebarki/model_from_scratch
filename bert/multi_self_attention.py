@@ -1,5 +1,5 @@
 import numpy as np
-from mln import mask
+
 
 def softmax(z):
     exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
